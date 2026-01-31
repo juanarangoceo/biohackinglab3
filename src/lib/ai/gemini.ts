@@ -9,14 +9,15 @@ if (!apiKey) {
 
 const genAI = new GoogleGenerativeAI(apiKey)
 
-// Use Gemini 1.5 Flash for fast, reliable generation
+// Use Gemini 2.0 Flash for maximum speed
 const model = genAI.getGenerativeModel({ 
-  model: 'gemini-1.5-flash',
+  model: 'gemini-2.0-flash-exp',
   generationConfig: {
-    temperature: 0.8, // Slightly creative but controlled
+    temperature: 0.8,
     topP: 0.95,
     topK: 40,
-    maxOutputTokens: 8192, // Enough for long-form content
+    maxOutputTokens: 8192,
+    responseMimeType: "application/json",
   },
 })
 

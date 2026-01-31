@@ -94,50 +94,44 @@ function generateSlug(title: string): string {
  * Generate a complete blog post from a topic
  * This creates a new Sanity document with all fields populated
  */
+import { SINGLE_SHOT_BLOG_PROMPT } from '@/lib/ai/prompts-v2'
+
+// ... (keep helper functions: generateKey, markdownToPortableText, generateSlug)
+
 export async function generateBlogFromTopic(
   topic: string,
   additionalPrompt?: string
 ): Promise<{ success: boolean; error?: string; data?: any; generatedContent?: any }> {
   try {
-    // Parallelize Content, Title, and Category generation for speed
-    const [contentResult, title, categoryRaw] = await Promise.all([
-      // 1. Content (Longest first)
-      generateContent(
-        'Eres un experto en Biohacking, Longevidad y Optimización del Rendimiento Humano.',
-        CONTENT_GENERATION_PROMPT(topic, additionalPrompt)
-      ),
-      // 2. Title
-      generateShortText(`Genera un título viral y optimizado para SEO sobre: "${topic}". 
-      El título debe:
-      - Prometer un beneficio claro o resolver un dolor
-      - Ser atractivo y clickeable
-      - Máximo 60 caracteres
-      - En español
-      
-      Responde SOLO con el título, sin comillas ni explicaciones.`),
-      // 3. Category
-      generateShortText(CATEGORY_SUGGESTION_PROMPT(topic))
-    ])
-
-    if (!contentResult.content || !title) {
-      throw new Error('Failed to generate content or title')
-    }
-
-    const contentMarkdown = contentResult.content
-    const category = categoryRaw?.toLowerCase() || 'longevidad'
-    const slug = generateSlug(title)
-
-    // 4. Generate excerpt (based on content, kept serial as it needs content)
-    // Could also parallelize if based on topic, but better quality from content
-    const excerpt = await generateShortText(
-      EXCERPT_GENERATION_PROMPT(contentMarkdown)
+    // Single-Shot Generation for maximum speed
+    const result = await generateContent(
+      'Eres un sistema experto de generación de contenido JSON.',
+      SINGLE_SHOT_BLOG_PROMPT(topic, additionalPrompt)
     )
 
-    // 5. Convert to Portable Text
-    const portableTextContent = markdownToPortableText(contentMarkdown)
+    if (!result.content) {
+      throw new Error('Failed to generate content')
+    }
 
-    // Return the generated content WITHOUT writing to Sanity
-    // The client will handle document creation
+    // Parse JSON response
+    let generatedData;
+    try {
+        generatedData = JSON.parse(result.content);
+    } catch (e) {
+        // Fallback cleanup if markdown blocks are included
+        const cleanJson = result.content.replace(/```json\n|\n```/g, '');
+        generatedData = JSON.parse(cleanJson);
+    }
+
+    const { title, content, excerpt, category } = generatedData;
+
+    if (!title || !content) {
+        throw new Error('Incomplete JSON response');
+    }
+
+    const slug = generateSlug(title)
+    const portableTextContent = markdownToPortableText(content)
+
     return {
       success: true,
       data: {
@@ -153,7 +147,7 @@ export async function generateBlogFromTopic(
         },
         content: portableTextContent,
         excerpt,
-        category,
+        category: category?.toLowerCase() || 'longevidad',
         aiGenerated: true,
         publishedAt: new Date().toISOString(),
       }
