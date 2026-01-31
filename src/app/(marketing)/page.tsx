@@ -1,17 +1,27 @@
-import Hero from "@/components/sections/Hero";
-import { FeaturesBento } from "@/components/sections/FeaturesBento";
+import { Header } from "@/components/sections/header"
+import { HeroSection } from "@/components/sections/hero-section"
+import { TopicsSection } from "@/components/sections/topics-section"
+import { MethodsSection } from "@/components/sections/methods-section"
+import { BenefitsSection } from "@/components/sections/benefits-section"
+import { TestimonialsSection } from "@/components/sections/testimonials-section"
+import { FAQSection } from "@/components/sections/faq-section"
+import { NewsletterSection } from "@/components/sections/newsletter-section"
+import { FinalCTASection } from "@/components/sections/final-cta-section"
+import { Footer } from "@/components/sections/footer"
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="flex flex-col min-h-screen">
-      <Hero />
-      
-      {/* Spacer for Future Sections */}
-      <FeaturesBento />
-      
-      <div className="py-20 text-center text-muted-foreground bg-white/5">
-        <p>[Newsletter Capture Placeholder]</p>
-      </div>
-    </div>
-  );
+    <main className="min-h-screen bg-background">
+      <Header />
+      <HeroSection />
+      <TopicsSection />
+      <MethodsSection />
+      <BenefitsSection />
+      <TestimonialsSection />
+      <FAQSection />
+      <NewsletterSection />
+      <FinalCTASection />
+      <Footer />
+    </main>
+  )
 }
