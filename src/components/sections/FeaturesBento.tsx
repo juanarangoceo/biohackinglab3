@@ -1,5 +1,8 @@
+"use client";
+
 import { Brain, Moon, Hourglass, Zap, Thermometer, Watch, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 const features = [
   {
@@ -60,6 +63,21 @@ const features = [
   },
 ];
 
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 }
+};
+
 export function FeaturesBento() {
   return (
     <section className="py-24 bg-background relative overflow-hidden">
@@ -67,19 +85,38 @@ export function FeaturesBento() {
         
         {/* Section Header */}
         <div className="mb-16 text-center max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4 font-display">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-3xl md:text-5xl font-bold tracking-tight mb-4 font-display"
+          >
             Sistemas de <span className="text-primary">Optimizaci\u00f3n</span>
-          </h2>
-          <p className="text-muted-foreground text-lg">
+          </motion.h2>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-muted-foreground text-lg"
+          >
             Explora los pilares fundamentales para reprogramar tu biolog\u00eda y alcanzar el m\u00e1ximo potencial humano.
-          </p>
+          </motion.p>
         </div>
 
         {/* Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-[minmax(180px,auto)]">
+        <motion.div 
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-100px" }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-[minmax(180px,auto)]"
+        >
           {features.map((feature, i) => (
-            <div
+            <motion.div
               key={i}
+              variants={item}
               className={cn(
                 "group relative overflow-hidden rounded-2xl border p-8 transition-all duration-300 hover:shadow-2xl hover:scale-[1.01]",
                 feature.className,
@@ -106,9 +143,9 @@ export function FeaturesBento() {
                   feature.color.replace("text-", "bg-")
                 )}
               />
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
