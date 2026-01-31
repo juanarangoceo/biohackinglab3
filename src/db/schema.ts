@@ -22,11 +22,12 @@ export const posts = pgTable("posts", {
   slug: varchar("slug", { length: 255 }).notNull().unique(),
   title: varchar("title", { length: 255 }).notNull(),
   excerpt: text("excerpt"),
-  content: text("content"), // Markdown/MDX content
+  content: text("content"), // Markdown/MDX content or Portable Text JSON
   coverImage: varchar("cover_image", { length: 255 }),
   publishedAt: timestamp("published_at"), // If null, it's a draft
   category: varchar("category", { length: 50 }).notNull(), // Nootropics, Sleep, etc.
-  authorId: uuid("author_id"), // Placeholder for user relation
+  sanityId: varchar("sanity_id", { length: 255 }).unique(), // Link to Sanity CMS document
+  aiGenerated: boolean("ai_generated").default(false).notNull(), // Track AI-generated content
   seoTags: jsonb("seo_tags").$type<{ title: string; description: string; keywords: string[] }>().default({ title: "", description: "", keywords: [] }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
