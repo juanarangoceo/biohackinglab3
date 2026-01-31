@@ -6,6 +6,8 @@ import { AppCard } from "@/components/features/apps/AppCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { desc } from "drizzle-orm";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Apps Directory | Biohacking Lab 3.0",
   description: "Curated list of the best applications for sleep tracking, meditation, and cognitive enhancement.",
