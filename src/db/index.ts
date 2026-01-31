@@ -8,9 +8,15 @@ dotenv.config({ path: '.env' });
 // The app will still fail at runtime if DB is accessed without valid URL
 const connectionString = process.env.DATABASE_URL || "postgres://placeholder:placeholder@localhost:5432/placeholder";
 
+
 if (!process.env.DATABASE_URL) {
   console.warn("⚠️ DATABASE_URL is not defined used placeholder. DB operations will fail.");
+} else {
+  // Debug log to verify connection string format (hiding password)
+  const maskedUrl = process.env.DATABASE_URL.replace(/:([^@]+)@/, ':****@');
+  console.log("✅ DATABASE_URL loaded:", maskedUrl);
 }
+
 
 const pool = new Pool({
   connectionString,
