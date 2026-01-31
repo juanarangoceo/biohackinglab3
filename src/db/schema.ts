@@ -28,6 +28,7 @@ export const posts = pgTable("posts", {
   category: varchar("category", { length: 50 }).notNull(), // Nootropics, Sleep, etc.
   sanityId: varchar("sanity_id", { length: 255 }).unique(), // Link to Sanity CMS document
   aiGenerated: boolean("ai_generated").default(false).notNull(), // Track AI-generated content
+  faq: jsonb("faq").$type<Array<{ question: string; answer: string }>>(), // FAQ section for SEO
   seoTags: jsonb("seo_tags").$type<{ title: string; description: string; keywords: string[] }>().default({ title: "", description: "", keywords: [] }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

@@ -105,12 +105,6 @@ export function BlogGrid({ posts, currentPage, totalPages, activeCategory }: Blo
                       <Badge variant="secondary" className="font-mono text-xs capitalize">
                         {article.category}
                       </Badge>
-                      {article.aiGenerated && (
-                        <Badge variant="outline" className="gap-1 font-mono text-xs">
-                          <Sparkles className="h-3 w-3" />
-                          AI
-                        </Badge>
-                      )}
                     </div>
                     
                     <h2 className="mb-3 font-mono text-2xl font-bold text-foreground transition-colors group-hover:text-primary text-balance">
@@ -155,12 +149,6 @@ export function BlogGrid({ posts, currentPage, totalPages, activeCategory }: Blo
                     <Badge variant="secondary" className="font-mono text-xs capitalize">
                       {article.category}
                     </Badge>
-                    {article.aiGenerated && (
-                      <Badge variant="outline" className="gap-1 font-mono text-xs">
-                        <Sparkles className="h-3 w-3" />
-                        AI
-                      </Badge>
-                    )}
                   </div>
                   
                   <h3 className="mb-3 font-mono text-lg font-semibold text-foreground transition-colors group-hover:text-primary text-balance">
