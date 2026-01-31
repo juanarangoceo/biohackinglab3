@@ -14,7 +14,7 @@ export async function POST(req: Request) {
       )
     }
 
-    // Insert into Supabase
+    // Insert into Supabase with Upsert (onConflictDoUpdate)
     await db.insert(posts).values({
       slug: slug.current || slug,
       title,
@@ -24,6 +24,16 @@ export async function POST(req: Request) {
       sanityId: _id,
       aiGenerated: aiGenerated || false,
       publishedAt: publishedAt ? new Date(publishedAt) : new Date(),
+    }).onConflictDoUpdate({
+      target: posts.sanityId,
+      set: {
+        title,
+        excerpt: excerpt || '',
+        content: JSON.stringify(content),
+        category: category || 'general',
+        slug: slug.current || slug,
+        updatedAt: new Date(),
+      }
     })
 
     return NextResponse.json({ success: true })

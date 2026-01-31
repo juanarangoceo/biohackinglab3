@@ -9,9 +9,9 @@ if (!apiKey) {
 
 const genAI = new GoogleGenerativeAI(apiKey)
 
-// Use Gemini 2.5 Flash for fast, reliable generation
+// Use Gemini 1.5 Flash for fast, reliable generation
 const model = genAI.getGenerativeModel({ 
-  model: 'models/gemini-2.5-flash',
+  model: 'gemini-1.5-flash',
   generationConfig: {
     temperature: 0.8, // Slightly creative but controlled
     topP: 0.95,
