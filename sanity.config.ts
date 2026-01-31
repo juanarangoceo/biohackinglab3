@@ -9,7 +9,6 @@ import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
 
 import { schemaTypes } from './src/sanity/schemaTypes'
-import { AIGenerateAction } from './src/sanity/plugins/ai-generate-action'
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!
 const dataset = 'production'
@@ -28,12 +27,4 @@ export default defineConfig({
     // https://www.sanity.io/docs/the-vision-plugin
     visionTool({ defaultApiVersion: '2024-01-01' }),
   ],
-  document: {
-    actions: (prev, context) => {
-      if (context.schemaType === 'post') {
-        return [...prev, AIGenerateAction]
-      }
-      return prev
-    },
-  },
 })

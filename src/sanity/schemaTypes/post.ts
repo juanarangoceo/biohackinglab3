@@ -1,4 +1,5 @@
 import { defineType, defineField } from 'sanity'
+import { GeneratePostInput } from '../components/GeneratePostInput'
 
 export default defineType({
   name: 'post',
@@ -6,10 +7,20 @@ export default defineType({
   type: 'document',
   fields: [
     defineField({
+      name: 'topic',
+      title: 'AI Topic Generator',
+      type: 'string',
+      description: 'Ingresa el tema aquí y usa el botón para generar el blog completo automáticamente.',
+      components: {
+        input: GeneratePostInput,
+      },
+    }),
+    defineField({
       name: 'title',
       title: 'Title',
       type: 'string',
-      validation: (Rule) => Rule.required().max(100),
+      validation: (Rule) => Rule.max(100),
+      description: 'Se genera automáticamente. Puedes editarlo después.',
     }),
     defineField({
       name: 'slug',
@@ -19,14 +30,7 @@ export default defineType({
         source: 'title',
         maxLength: 96,
       },
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: 'topic',
-      title: 'AI Topic (for generation)',
-      type: 'text',
-      description: 'Paste the topic here and click "Generate with AI" to create content automatically. Leave empty if writing manually.',
-      rows: 3,
+      description: 'Se genera automáticamente. Puedes editarlo después.',
     }),
     defineField({
       name: 'content',
@@ -76,6 +80,7 @@ export default defineType({
           ],
         },
       ],
+      description: 'Se genera automáticamente. Puedes editarlo después.',
     }),
     defineField({
       name: 'excerpt',
@@ -83,6 +88,7 @@ export default defineType({
       type: 'text',
       rows: 3,
       validation: (Rule) => Rule.max(200),
+      description: 'Se genera automáticamente. Puedes editarlo después.',
     }),
     defineField({
       name: 'mainImage',
@@ -96,7 +102,6 @@ export default defineType({
           name: 'alt',
           type: 'string',
           title: 'Alternative text',
-          validation: (Rule) => Rule.required(),
         },
       ],
     }),
@@ -113,7 +118,7 @@ export default defineType({
           { title: 'Fitness', value: 'fitness' },
         ],
       },
-      validation: (Rule) => Rule.required(),
+      description: 'Se genera automáticamente. Puedes editarlo después.',
     }),
     defineField({
       name: 'aiGenerated',
@@ -126,7 +131,7 @@ export default defineType({
       name: 'publishedAt',
       title: 'Published at',
       type: 'datetime',
-      initialValue: () => new Date().toISOString(),
+      description: 'Se establece automáticamente al publicar.',
     }),
   ],
   preview: {
@@ -137,7 +142,7 @@ export default defineType({
     },
     prepare({ title, subtitle, media }) {
       return {
-        title,
+        title: title || 'Sin título (genera con IA)',
         subtitle: subtitle ? subtitle.toUpperCase() : 'No category',
         media,
       }

@@ -4,212 +4,191 @@ import { revalidatePath } from 'next/cache'
 import { sanityWriteClient } from '@/lib/sanity/client'
 import { generateContent, generateShortText } from '@/lib/ai/gemini'
 import {
-  SYSTEM_PROMPT,
   CONTENT_GENERATION_PROMPT,
   EXCERPT_GENERATION_PROMPT,
   CATEGORY_SUGGESTION_PROMPT,
 } from '@/lib/ai/prompts'
 import { db } from '@/db'
 import { posts } from '@/db/schema'
-import { eq } from 'drizzle-orm'
 
-export interface GenerateBlogResult {
-  success: boolean
-  message: string
-  postId?: string
-  error?: string
-}
-
-/**
- * Convert markdown to Portable Text blocks
- */
-function markdownToPortableText(markdown: string): any[] {
+// Helper to convert markdown to Portable Text
+function markdownToPortableText(markdown: string) {
   const blocks: any[] = []
   const lines = markdown.split('\n')
   
-  let currentParagraph: string[] = []
+  let currentBlock: any = null
   
   for (const line of lines) {
-    const trimmed = line.trim()
+    if (line.trim() === '') {
+      if (currentBlock) {
+        blocks.push(currentBlock)
+        currentBlock = null
+      }
+      continue
+    }
     
     // H2
-    if (trimmed.startsWith('## ')) {
-      if (currentParagraph.length > 0) {
-        blocks.push({
-          _type: 'block',
-          style: 'normal',
-          children: [{ _type: 'span', text: currentParagraph.join(' ') }],
-        })
-        currentParagraph = []
-      }
+    if (line.startsWith('## ')) {
+      if (currentBlock) blocks.push(currentBlock)
       blocks.push({
         _type: 'block',
         style: 'h2',
-        children: [{ _type: 'span', text: trimmed.replace('## ', '') }],
+        children: [{ _type: 'span', text: line.replace('## ', '') }],
       })
+      currentBlock = null
+      continue
     }
+    
     // H3
-    else if (trimmed.startsWith('### ')) {
-      if (currentParagraph.length > 0) {
-        blocks.push({
-          _type: 'block',
-          style: 'normal',
-          children: [{ _type: 'span', text: currentParagraph.join(' ') }],
-        })
-        currentParagraph = []
-      }
+    if (line.startsWith('### ')) {
+      if (currentBlock) blocks.push(currentBlock)
       blocks.push({
         _type: 'block',
         style: 'h3',
-        children: [{ _type: 'span', text: trimmed.replace('### ', '') }],
+        children: [{ _type: 'span', text: line.replace('### ', '') }],
       })
+      currentBlock = null
+      continue
     }
-    // Empty line - end paragraph
-    else if (trimmed === '') {
-      if (currentParagraph.length > 0) {
-        blocks.push({
-          _type: 'block',
-          style: 'normal',
-          children: [{ _type: 'span', text: currentParagraph.join(' ') }],
-        })
-        currentParagraph = []
+    
+    // Bold text
+    const processedLine = line.replace(/\*\*(.*?)\*\*/g, (_, text) => text)
+    
+    if (!currentBlock) {
+      currentBlock = {
+        _type: 'block',
+        style: 'normal',
+        children: [{ _type: 'span', text: processedLine }],
       }
-    }
-    // Regular text
-    else {
-      currentParagraph.push(trimmed)
+    } else {
+      currentBlock.children[0].text += ' ' + processedLine
     }
   }
   
-  // Add remaining paragraph
-  if (currentParagraph.length > 0) {
-    blocks.push({
-      _type: 'block',
-      style: 'normal',
-      children: [{ _type: 'span', text: currentParagraph.join(' ') }],
-    })
-  }
+  if (currentBlock) blocks.push(currentBlock)
   
   return blocks
 }
 
+// Helper to generate slug from title
+function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Remove accents
+    .replace(/[^a-z0-9\s-]/g, '') // Remove special chars
+    .trim()
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Remove consecutive hyphens
+}
+
 /**
- * Generate a blog post using AI and save to Sanity + Supabase
+ * Generate a complete blog post from a topic
+ * This creates a new Sanity document with all fields populated
  */
-export async function generateBlog(
-  sanityId: string,
-  topic: string
-): Promise<GenerateBlogResult> {
+export async function generateBlogFromTopic(
+  topic: string,
+  additionalPrompt?: string
+): Promise<{ success: boolean; error?: string; data?: any }> {
   try {
-    console.log(`[AI Blog] Starting generation for topic: "${topic}"`)
-
-    // 1. Generate main content
-    const contentResult = await generateContent(
-      SYSTEM_PROMPT,
-      CONTENT_GENERATION_PROMPT(topic)
-    )
-
-    if (contentResult.error || !contentResult.content) {
-      return {
-        success: false,
-        message: 'Failed to generate content',
-        error: contentResult.error || 'Empty response from AI',
-      }
+    // 1. Generate title
+    const titlePrompt = `Genera un título viral y optimizado para SEO sobre: "${topic}". 
+    El título debe:
+    - Prometer un beneficio claro o resolver un dolor
+    - Ser atractivo y clickeable
+    - Máximo 60 caracteres
+    - En español
+    
+    Responde SOLO con el título, sin comillas ni explicaciones.`
+    
+    const title = await generateShortText(titlePrompt)
+    if (!title) {
+      throw new Error('Failed to generate title')
     }
 
-    console.log(`[AI Blog] Content generated (${contentResult.tokensUsed} tokens)`)
+    // 2. Generate slug
+    const slug = generateSlug(title)
 
-    // 2. Generate excerpt
+    // 3. Generate content
+    const contentResult = await generateContent(
+      'Eres un experto en Biohacking, Longevidad y Optimización del Rendimiento Humano.',
+      CONTENT_GENERATION_PROMPT(topic, additionalPrompt)
+    )
+    if (!contentResult.content) {
+      throw new Error('Failed to generate content')
+    }
+    const contentMarkdown = contentResult.content
+
+    // 4. Convert to Portable Text
+    const portableTextContent = markdownToPortableText(contentMarkdown)
+
+    // 5. Generate excerpt
     const excerpt = await generateShortText(
-      EXCERPT_GENERATION_PROMPT(contentResult.content)
+      EXCERPT_GENERATION_PROMPT(contentMarkdown)
     )
 
-    // 3. Suggest category
-    const category = await generateShortText(
+    // 6. Suggest category
+    const categoryRaw = await generateShortText(
       CATEGORY_SUGGESTION_PROMPT(topic)
     )
+    const category = categoryRaw?.toLowerCase() || 'longevidad'
 
-    // 4. Convert markdown to Portable Text
-    const portableTextBlocks = markdownToPortableText(contentResult.content)
+    // 7. Create Sanity document
+    const sanityDoc = await sanityWriteClient.create({
+      _type: 'post',
+      title,
+      slug: {
+        _type: 'slug',
+        current: slug,
+      },
+      content: portableTextContent,
+      excerpt,
+      category,
+      aiGenerated: true,
+      publishedAt: new Date().toISOString(),
+    })
 
-    // 5. Update Sanity document
-    await sanityWriteClient
-      .patch(sanityId)
-      .set({
-        content: portableTextBlocks,
-        excerpt: excerpt || topic.substring(0, 150),
-        category: category || 'nootropicos',
+    // 8. Sync to Supabase
+    try {
+      await db.insert(posts).values({
+        slug,
+        title,
+        excerpt: excerpt || '',
+        content: JSON.stringify(portableTextContent),
+        category,
+        sanityId: sanityDoc._id,
         aiGenerated: true,
+        publishedAt: new Date(),
       })
-      .commit()
-
-    console.log(`[AI Blog] Sanity document updated: ${sanityId}`)
-
-    // 6. Fetch the updated document to get all fields
-    const sanityPost = await sanityWriteClient.getDocument(sanityId)
-
-    if (!sanityPost) {
-      throw new Error('Failed to fetch updated Sanity document')
+    } catch (dbError) {
+      console.error('Supabase sync error:', dbError)
+      // Don't fail the whole operation if Supabase sync fails
     }
 
-    // 7. Sync to Supabase
-    const slug = sanityPost.slug?.current
-
-    if (slug) {
-      // Check if post already exists in Supabase
-      const existingPost = await db
-        .select()
-        .from(posts)
-        .where(eq(posts.sanityId, sanityId))
-        .limit(1)
-
-      if (existingPost.length > 0) {
-        // Update existing
-        await db
-          .update(posts)
-          .set({
-            title: sanityPost.title,
-            slug,
-            excerpt: sanityPost.excerpt,
-            content: JSON.stringify(portableTextBlocks),
-            category: sanityPost.category,
-            aiGenerated: true,
-            publishedAt: sanityPost.publishedAt ? new Date(sanityPost.publishedAt) : null,
-            updatedAt: new Date(),
-          })
-          .where(eq(posts.sanityId, sanityId))
-      } else {
-        // Insert new
-        await db.insert(posts).values({
-          sanityId,
-          slug,
-          title: sanityPost.title,
-          excerpt: sanityPost.excerpt,
-          content: JSON.stringify(portableTextBlocks),
-          category: sanityPost.category,
-          aiGenerated: true,
-          publishedAt: sanityPost.publishedAt ? new Date(sanityPost.publishedAt) : null,
-        })
-      }
-
-      console.log(`[AI Blog] Supabase synced for slug: ${slug}`)
-    }
-
-    // 8. Revalidate pages
+    // 9. Revalidate pages
     revalidatePath('/blog')
     revalidatePath(`/blog/${slug}`)
 
     return {
       success: true,
-      message: 'Blog post generated successfully!',
-      postId: sanityId,
+      data: {
+        id: sanityDoc._id,
+        title,
+        slug,
+        category,
+      },
     }
   } catch (error) {
-    console.error('[AI Blog] Generation error:', error)
+    console.error('Generate blog error:', error)
     return {
       success: false,
-      message: 'Failed to generate blog post',
       error: error instanceof Error ? error.message : 'Unknown error',
     }
   }
+}
+
+// Keep the old function for backwards compatibility
+export async function generateBlog(documentId: string, topic: string) {
+  // This is deprecated but kept for any existing references
+  return generateBlogFromTopic(topic)
 }
