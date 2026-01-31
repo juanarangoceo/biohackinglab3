@@ -89,7 +89,7 @@ function generateSlug(title: string): string {
 export async function generateBlogFromTopic(
   topic: string,
   additionalPrompt?: string
-): Promise<{ success: boolean; error?: string; data?: any }> {
+): Promise<{ success: boolean; error?: string; data?: any; generatedContent?: any }> {
   try {
     // 1. Generate title
     const titlePrompt = `Genera un título viral y optimizado para SEO sobre: "${topic}". 
@@ -133,50 +133,27 @@ export async function generateBlogFromTopic(
     )
     const category = categoryRaw?.toLowerCase() || 'longevidad'
 
-    // 7. Create Sanity document
-    const sanityDoc = await sanityWriteClient.create({
-      _type: 'post',
-      title,
-      slug: {
-        _type: 'slug',
-        current: slug,
-      },
-      content: portableTextContent,
-      excerpt,
-      category,
-      aiGenerated: true,
-      publishedAt: new Date().toISOString(),
-    })
-
-    // 8. Sync to Supabase
-    try {
-      await db.insert(posts).values({
-        slug,
-        title,
-        excerpt: excerpt || '',
-        content: JSON.stringify(portableTextContent),
-        category,
-        sanityId: sanityDoc._id,
-        aiGenerated: true,
-        publishedAt: new Date(),
-      })
-    } catch (dbError) {
-      console.error('Supabase sync error:', dbError)
-      // Don't fail the whole operation if Supabase sync fails
-    }
-
-    // 9. Revalidate pages
-    revalidatePath('/blog')
-    revalidatePath(`/blog/${slug}`)
-
+    // Return the generated content WITHOUT writing to Sanity
+    // The client will handle document creation
     return {
       success: true,
       data: {
-        id: sanityDoc._id,
         title,
         slug,
         category,
       },
+      generatedContent: {
+        title,
+        slug: {
+          _type: 'slug',
+          current: slug,
+        },
+        content: portableTextContent,
+        excerpt,
+        category,
+        aiGenerated: true,
+        publishedAt: new Date().toISOString(),
+      }
     }
   } catch (error) {
     console.error('Generate blog error:', error)

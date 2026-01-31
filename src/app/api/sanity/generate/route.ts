@@ -15,6 +15,8 @@ export async function POST(req: Request) {
       )
     }
 
+    // Generate content but DON'T write to Sanity
+    // Return the generated data to the client instead
     const result = await generateBlogFromTopic(topic, additionalPrompt)
 
     if (!result.success) {
@@ -24,7 +26,13 @@ export async function POST(req: Request) {
       )
     }
 
-    return NextResponse.json({ success: true, data: result.data })
+    // Return the generated content to the client
+    // The client (Sanity Studio) will create the document
+    return NextResponse.json({ 
+      success: true, 
+      data: result.data,
+      generatedContent: result.generatedContent // Include full content
+    })
   } catch (error) {
     console.error('API Error:', error)
     return NextResponse.json(

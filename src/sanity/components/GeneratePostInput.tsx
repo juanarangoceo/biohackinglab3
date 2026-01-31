@@ -41,15 +41,29 @@ export function GeneratePostInput(props: StringInputProps) {
 
       const result = await response.json()
 
-      if (result.success) {
+      if (result.success && result.generatedContent) {
+        // Create the document using Sanity Studio's client (has write permissions)
+        const { client } = await import('sanity')
+        const sanityClient = client({
+          projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
+          dataset: 'production',
+          apiVersion: '2024-01-01',
+          useCdn: false,
+        })
+
+        // Create the document
+        const doc = await sanityClient.create({
+          _type: 'post',
+          ...result.generatedContent,
+        })
+
         setSuccess(true)
         setError(null)
-        // Clear the topic field after successful generation
         setTopic('')
         setAdditionalPrompt('')
         onChange(unset())
         
-        // Reload the page to show the generated content
+        // Reload to show the new post
         setTimeout(() => {
           window.location.reload()
         }, 1500)
