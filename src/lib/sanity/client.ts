@@ -19,12 +19,20 @@ export const sanityClient = createClient({
 })
 
 // Write client for mutations (requires token)
+const sanityToken = process.env.SANITY_API_TOKEN;
+
+if (!sanityToken) {
+  console.warn('⚠️ SANITY_API_TOKEN is not set. Write operations will fail.');
+} else {
+  console.log('✅ SANITY_API_TOKEN loaded:', sanityToken.substring(0, 10) + '...');
+}
+
 export const sanityWriteClient = createClient({
   projectId,
   dataset,
   apiVersion,
   useCdn: false, // Don't use CDN for writes
-  token: process.env.SANITY_API_TOKEN,
+  token: sanityToken,
   perspective: 'published',
 })
 
