@@ -46,9 +46,25 @@ export function GeneratePostInput(props: StringInputProps) {
 
       if (result.success && result.generatedContent) {
         // Create the document using Studio's authenticated client
-        await client.create({
+        const doc = await client.create({
           _type: 'post',
           ...result.generatedContent,
+        })
+
+        // CRITICAL: Sync to Supabase so it appears on the blog page
+        await fetch('/api/sanity/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            _id: doc._id,
+            title: doc.title,
+            slug: doc.slug,
+            excerpt: doc.excerpt,
+            content: doc.content,
+            category: doc.category,
+            aiGenerated: doc.aiGenerated,
+            publishedAt: doc.publishedAt,
+          }),
         })
 
         setSuccess(true)

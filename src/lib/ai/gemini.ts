@@ -9,9 +9,9 @@ if (!apiKey) {
 
 const genAI = new GoogleGenerativeAI(apiKey)
 
-// Use Gemini 2.0 Flash for maximum speed
+// Use Gemini 3 Flash Preview for maximum speed
 const model = genAI.getGenerativeModel({ 
-  model: 'gemini-2.0-flash-exp',
+  model: 'gemini-3-flash-preview',
   generationConfig: {
     temperature: 0.8,
     topP: 0.95,
