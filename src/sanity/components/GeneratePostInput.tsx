@@ -43,16 +43,17 @@ export function GeneratePostInput(props: StringInputProps) {
 
       if (result.success && result.generatedContent) {
         // Create the document using Sanity Studio's client (has write permissions)
-        const { client } = await import('sanity')
-        const sanityClient = client({
+        const { createClient } = await import('@sanity/client')
+        const sanityClient = createClient({
           projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
           dataset: 'production',
           apiVersion: '2024-01-01',
           useCdn: false,
+          token: undefined, // Use Studio's session
         })
 
         // Create the document
-        const doc = await sanityClient.create({
+        await sanityClient.create({
           _type: 'post',
           ...result.generatedContent,
         })
