@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from 'react'
 import { TextArea, Button, Stack, Card, Text, Spinner } from '@sanity/ui'
-import { set, unset } from 'sanity'
+import { set, unset, useClient } from 'sanity'
 import { StringInputProps } from 'sanity'
 
 export function GeneratePostInput(props: StringInputProps) {
@@ -12,6 +12,9 @@ export function GeneratePostInput(props: StringInputProps) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  
+  // Use Studio's authenticated client
+  const client = useClient({ apiVersion: '2024-01-01' })
 
   const handleGenerate = useCallback(async () => {
     if (!topic || topic.trim() === '') {
