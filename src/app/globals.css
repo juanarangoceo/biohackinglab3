@@ -1,0 +1,103 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* Biohacking Lab 3.0 - Brand Colors applied to Shadcn UI Base */
+
+@theme {
+  --font-sans: var(--font-manrope);
+  --font-display: var(--font-space);
+  
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  
+  --radius: 0.75rem;
+}
+
+:root {
+  /* HSL Values from Design System */
+  
+  --background: hsl(240 10% 4%);
+  --foreground: hsl(0 0% 98%);
+  
+  --card: hsl(240 10% 7%);
+  --card-foreground: hsl(0 0% 98%);
+  
+  --popover: hsl(240 10% 7%);
+  --popover-foreground: hsl(0 0% 98%);
+  
+  --primary: hsl(142 71% 45%); /* Bio-Electric Green */
+  --primary-foreground: hsl(240 10% 4%);
+  
+  --secondary: hsl(217 91% 60%); /* Neuro Blue */
+  --secondary-foreground: hsl(240 10% 4%);
+  
+  --accent: hsl(262 83% 58%); /* Deep Sleep Violet */
+  --accent-foreground: hsl(0 0% 98%);
+  
+  --muted: hsl(240 5% 65%);
+  --muted-foreground: hsl(240 5% 40%);
+  
+  --destructive: hsl(0 84% 60%);
+  --destructive-foreground: hsl(0 0% 98%);
+  
+  --border: hsl(240 4% 16%);
+  --input: hsl(240 4% 16%);
+  --ring: hsl(142 71% 45%);
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor); /* Default fallback */
+  }
+  
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight text-foreground;
+  }
+  
+  h1 {
+    @apply text-5xl md:text-7xl font-bold;
+  }
+  h2 {
+    @apply text-3xl md:text-5xl font-bold;
+  }
+  h3 {
+    @apply text-2xl font-semibold;
+  }
+}
