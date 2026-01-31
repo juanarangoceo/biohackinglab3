@@ -1,82 +1,36 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { revalidatePath } from 'next/cache'
+import { NextResponse } from 'next/server'
 import { db } from '@/db'
 import { posts } from '@/db/schema'
-import { eq } from 'drizzle-orm'
 
-export async function POST(request: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const body = await request.json()
-    
-    // Sanity webhook payload structure
-    const { _id, _type, slug, title, excerpt, content, category, publishedAt, aiGenerated } = body
+    const body = await req.json()
+    const { _id, title, slug, excerpt, content, category, aiGenerated, publishedAt } = body
 
-    if (_type !== 'post') {
-      return NextResponse.json({ success: true, message: 'Not a post document' })
-    }
-
-    console.log(`[Webhook] Syncing post: ${_id}`)
-
-    // Check if post exists in Supabase
-    const existingPost = await db
-      .select()
-      .from(posts)
-      .where(eq(posts.sanityId, _id))
-      .limit(1)
-
-    const slugCurrent = slug?.current
-
-    if (!slugCurrent) {
+    if (!_id || !slug || !title) {
       return NextResponse.json(
-        { success: false, error: 'Missing slug' },
+        { success: false, error: 'Missing required fields' },
         { status: 400 }
       )
     }
 
-    if (existingPost.length > 0) {
-      // Update existing post
-      await db
-        .update(posts)
-        .set({
-          title,
-          slug: slugCurrent,
-          excerpt,
-          content: content ? JSON.stringify(content) : null,
-          category,
-          aiGenerated: aiGenerated || false,
-          publishedAt: publishedAt ? new Date(publishedAt) : null,
-          updatedAt: new Date(),
-        })
-        .where(eq(posts.sanityId, _id))
-    } else {
-      // Insert new post
-      await db.insert(posts).values({
-        sanityId: _id,
-        slug: slugCurrent,
-        title,
-        excerpt,
-        content: content ? JSON.stringify(content) : null,
-        category,
-        aiGenerated: aiGenerated || false,
-        publishedAt: publishedAt ? new Date(publishedAt) : null,
-      })
-    }
-
-    // Revalidate blog pages
-    revalidatePath('/blog')
-    revalidatePath(`/blog/${slugCurrent}`)
-
-    return NextResponse.json({
-      success: true,
-      message: 'Post synced successfully',
+    // Insert into Supabase
+    await db.insert(posts).values({
+      slug: slug.current || slug,
+      title,
+      excerpt: excerpt || '',
+      content: JSON.stringify(content),
+      category: category || 'general',
+      sanityId: _id,
+      aiGenerated: aiGenerated || false,
+      publishedAt: publishedAt ? new Date(publishedAt) : new Date(),
     })
+
+    return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('[Webhook] Sync error:', error)
+    console.error('Sync error:', error)
     return NextResponse.json(
-      { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Internal server error' 
-      },
+      { success: false, error: 'Failed to sync to Supabase' },
       { status: 500 }
     )
   }

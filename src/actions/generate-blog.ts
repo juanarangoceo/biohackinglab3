@@ -11,6 +11,11 @@ import {
 import { db } from '@/db'
 import { posts } from '@/db/schema'
 
+// Helper to generate a random key
+function generateKey() {
+  return Math.random().toString(36).substring(2, 9)
+}
+
 // Helper to convert markdown to Portable Text
 function markdownToPortableText(markdown: string) {
   const blocks: any[] = []
@@ -31,9 +36,10 @@ function markdownToPortableText(markdown: string) {
     if (line.startsWith('## ')) {
       if (currentBlock) blocks.push(currentBlock)
       blocks.push({
+        _key: generateKey(),
         _type: 'block',
         style: 'h2',
-        children: [{ _type: 'span', text: line.replace('## ', '') }],
+        children: [{ _key: generateKey(), _type: 'span', text: line.replace('## ', '') }],
       })
       currentBlock = null
       continue
@@ -43,9 +49,10 @@ function markdownToPortableText(markdown: string) {
     if (line.startsWith('### ')) {
       if (currentBlock) blocks.push(currentBlock)
       blocks.push({
+        _key: generateKey(),
         _type: 'block',
         style: 'h3',
-        children: [{ _type: 'span', text: line.replace('### ', '') }],
+        children: [{ _key: generateKey(), _type: 'span', text: line.replace('### ', '') }],
       })
       currentBlock = null
       continue
@@ -56,9 +63,10 @@ function markdownToPortableText(markdown: string) {
     
     if (!currentBlock) {
       currentBlock = {
+        _key: generateKey(),
         _type: 'block',
         style: 'normal',
-        children: [{ _type: 'span', text: processedLine }],
+        children: [{ _key: generateKey(), _type: 'span', text: processedLine }],
       }
     } else {
       currentBlock.children[0].text += ' ' + processedLine
@@ -91,47 +99,42 @@ export async function generateBlogFromTopic(
   additionalPrompt?: string
 ): Promise<{ success: boolean; error?: string; data?: any; generatedContent?: any }> {
   try {
-    // 1. Generate title
-    const titlePrompt = `Genera un título viral y optimizado para SEO sobre: "${topic}". 
-    El título debe:
-    - Prometer un beneficio claro o resolver un dolor
-    - Ser atractivo y clickeable
-    - Máximo 60 caracteres
-    - En español
-    
-    Responde SOLO con el título, sin comillas ni explicaciones.`
-    
-    const title = await generateShortText(titlePrompt)
-    if (!title) {
-      throw new Error('Failed to generate title')
+    // Parallelize Content, Title, and Category generation for speed
+    const [contentResult, title, categoryRaw] = await Promise.all([
+      // 1. Content (Longest first)
+      generateContent(
+        'Eres un experto en Biohacking, Longevidad y Optimización del Rendimiento Humano.',
+        CONTENT_GENERATION_PROMPT(topic, additionalPrompt)
+      ),
+      // 2. Title
+      generateShortText(`Genera un título viral y optimizado para SEO sobre: "${topic}". 
+      El título debe:
+      - Prometer un beneficio claro o resolver un dolor
+      - Ser atractivo y clickeable
+      - Máximo 60 caracteres
+      - En español
+      
+      Responde SOLO con el título, sin comillas ni explicaciones.`),
+      // 3. Category
+      generateShortText(CATEGORY_SUGGESTION_PROMPT(topic))
+    ])
+
+    if (!contentResult.content || !title) {
+      throw new Error('Failed to generate content or title')
     }
 
-    // 2. Generate slug
+    const contentMarkdown = contentResult.content
+    const category = categoryRaw?.toLowerCase() || 'longevidad'
     const slug = generateSlug(title)
 
-    // 3. Generate content
-    const contentResult = await generateContent(
-      'Eres un experto en Biohacking, Longevidad y Optimización del Rendimiento Humano.',
-      CONTENT_GENERATION_PROMPT(topic, additionalPrompt)
-    )
-    if (!contentResult.content) {
-      throw new Error('Failed to generate content')
-    }
-    const contentMarkdown = contentResult.content
-
-    // 4. Convert to Portable Text
-    const portableTextContent = markdownToPortableText(contentMarkdown)
-
-    // 5. Generate excerpt
+    // 4. Generate excerpt (based on content, kept serial as it needs content)
+    // Could also parallelize if based on topic, but better quality from content
     const excerpt = await generateShortText(
       EXCERPT_GENERATION_PROMPT(contentMarkdown)
     )
 
-    // 6. Suggest category
-    const categoryRaw = await generateShortText(
-      CATEGORY_SUGGESTION_PROMPT(topic)
-    )
-    const category = categoryRaw?.toLowerCase() || 'longevidad'
+    // 5. Convert to Portable Text
+    const portableTextContent = markdownToPortableText(contentMarkdown)
 
     // Return the generated content WITHOUT writing to Sanity
     // The client will handle document creation
