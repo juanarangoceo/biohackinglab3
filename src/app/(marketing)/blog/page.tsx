@@ -33,22 +33,38 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const currentPage = parseInt(params.page || '1', 10)
   const category = params.category || 'all'
 
-  // DIAGNOSTIC MOCK DATA - BYPASSING DB
-  // This is a temporary change to isolate the 500 error source
-  const blogPosts = [
-    {
-       id: '1',
-       title: 'TEST POST - DB BYPASSED',
-       slug: 'test-post',
-       excerpt: 'If you see this, the site works and the DB connection is the problem.',
-       publishedAt: new Date(),
-       coverImage: null,
-       category: 'System Check',
-       aiGenerated: false,
-    }
-  ];
-  const totalPosts = 1;
-  const totalPages = 1;
+  // Build query conditions
+  const conditions = [isNotNull(posts.publishedAt)]
+  if (category && category !== 'all') {
+    conditions.push(eq(posts.category, category))
+  }
+
+  // Fetch total count for pagination
+  const [countResult] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(posts)
+    .where(and(...conditions))
+
+  const totalPosts = Number(countResult?.count || 0)
+  const totalPages = Math.ceil(totalPosts / POSTS_PER_PAGE)
+
+  // Fetch paginated posts
+  const blogPosts = await db
+    .select({
+      id: posts.id,
+      slug: posts.slug,
+      title: posts.title,
+      excerpt: posts.excerpt,
+      category: posts.category,
+      publishedAt: posts.publishedAt,
+      coverImage: posts.coverImage,
+      aiGenerated: posts.aiGenerated,
+    })
+    .from(posts)
+    .where(and(...conditions))
+    .orderBy(desc(posts.publishedAt))
+    .limit(POSTS_PER_PAGE)
+    .offset((currentPage - 1) * POSTS_PER_PAGE)
 
   return (
     <main className="min-h-screen bg-background">
