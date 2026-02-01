@@ -13,6 +13,13 @@ import { TableOfContents } from "@/components/blog/TableOfContents"
 import { FAQSection } from "@/components/blog/FAQSection"
 import { RelatedPosts } from "@/components/blog/RelatedPosts"
 import { NewsletterCard } from "@/components/blog/NewsletterCard"
+import { generateBlogPostMetadata } from "@/lib/seo/metadata"
+import { 
+  generateArticleSchema, 
+  generateFAQSchema, 
+  generateBreadcrumbSchema,
+  combineSchemas 
+} from "@/lib/seo/schema"
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -35,18 +42,15 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
     }
   }
 
-  return {
-    title: `${post.title} | BioHack Lab`,
-    description: post.excerpt || post.title,
-    keywords: [post.category, "biohacking", "longevidad", "optimización humana"],
-    openGraph: {
-      title: post.title,
-      description: post.excerpt || post.title,
-      type: "article",
-      publishedTime: post.publishedAt?.toISOString(),
-      authors: ["BioHack Lab"],
-    },
-  }
+  return generateBlogPostMetadata({
+    title: post.title,
+    excerpt: post.excerpt || undefined,
+    category: post.category,
+    slug: post.slug,
+    publishedAt: post.publishedAt || undefined,
+    updatedAt: post.updatedAt || undefined,
+    coverImage: post.coverImage || undefined,
+  })
 }
 
 export const revalidate = 60 // ISR: Revalidate every 60 seconds
@@ -180,31 +184,31 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </div>
       </div>
 
-      {/* Article Structured Data */}
+      {/* Combined Structured Data */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Article",
-            "headline": post.title,
-            "description": post.excerpt || post.title,
-            "author": {
-              "@type": "Organization",
-              "name": "BioHack Lab",
-            },
-            "publisher": {
-              "@type": "Organization",
-              "name": "BioHack Lab",
-              "logo": {
-                "@type": "ImageObject",
-                "url": "https://biohackinglab3.com/logo.png",
-              },
-            },
-            "datePublished": post.publishedAt?.toISOString(),
-            "dateModified": post.updatedAt?.toISOString(),
-            "articleSection": post.category,
-          }),
+          __html: JSON.stringify(
+            combineSchemas(
+              generateArticleSchema({
+                title: post.title,
+                description: post.excerpt || undefined,
+                slug: post.slug,
+                publishedAt: post.publishedAt || undefined,
+                updatedAt: post.updatedAt || undefined,
+                category: post.category,
+                coverImage: post.coverImage || undefined,
+                content: typeof post.content === 'string' ? post.content : JSON.stringify(post.content),
+              }),
+              ...(faqData && faqData.length > 0 ? [generateFAQSchema(faqData)] : []),
+              generateBreadcrumbSchema([
+                { name: "Inicio", url: "/" },
+                { name: "Blog", url: "/blog" },
+                { name: post.category, url: `/blog?category=${post.category}` },
+                { name: post.title },
+              ])
+            )
+          ),
         }}
       />
       

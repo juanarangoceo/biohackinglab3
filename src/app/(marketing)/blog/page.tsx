@@ -6,15 +6,14 @@ import { NewsletterSection } from "@/components/sections/newsletter-section"
 import { db } from "@/db"
 import { posts } from "@/db/schema"
 import { desc, eq, and, isNotNull, sql } from "drizzle-orm"
+import { generateBlogListingMetadata } from "@/lib/seo/metadata"
+import { generateItemListSchema } from "@/lib/seo/schema"
 
-export const metadata: Metadata = {
-  title: "Blog de Biohacking | BioHack Lab",
-  description: "Artículos, guías y protocolos de biohacking respaldados por ciencia. Aprende sobre nootrópicos, sueño, longevidad, nutrición y más.",
-  keywords: ["blog biohacking", "artículos biohacking", "guías nootrópicos", "protocolos sueño", "longevidad", "optimización humana"],
-  openGraph: {
-    title: "Blog de Biohacking | BioHack Lab",
-    description: "Contenido científico para optimizar tu biología y rendimiento.",
-  },
+export async function generateMetadata({ searchParams }: BlogPageProps): Promise<Metadata> {
+  const params = await searchParams
+  const category = params.category || undefined
+  
+  return generateBlogListingMetadata(category)
 }
 
 export const revalidate = 60 // ISR: Revalidate every 60 seconds
@@ -76,6 +75,29 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         activeCategory={category}
       />
       <NewsletterSection />
+      
+      {/* ItemList Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            generateItemListSchema({
+              name: category && category !== 'all' 
+                ? `Artículos de ${category}` 
+                : "Blog de Biohacking",
+              description: category && category !== 'all'
+                ? `Artículos sobre ${category} - Protocolos y estrategias de biohacking`
+                : "Artículos, guías y protocolos de biohacking respaldados por ciencia",
+              items: blogPosts.map(post => ({
+                name: post.title,
+                url: `/blog/${post.slug}`,
+                description: post.excerpt || undefined,
+              })),
+            })
+          ),
+        }}
+      />
+      
       <Footer />
     </main>
   )

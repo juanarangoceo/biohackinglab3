@@ -128,6 +128,38 @@ export default defineType({
       initialValue: false,
     }),
     defineField({
+      name: 'faq',
+      title: 'FAQ (Preguntas Frecuentes)',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            {
+              name: 'question',
+              title: 'Pregunta',
+              type: 'string',
+              validation: (Rule) => Rule.required(),
+            },
+            {
+              name: 'answer',
+              title: 'Respuesta',
+              type: 'text',
+              rows: 4,
+              validation: (Rule) => Rule.required(),
+            },
+          ],
+          preview: {
+            select: {
+              title: 'question',
+              subtitle: 'answer',
+            },
+          },
+        },
+      ],
+      description: 'Se genera automáticamente por IA. Puedes editar o agregar más preguntas.',
+    }),
+    defineField({
       name: 'publishedAt',
       title: 'Published at',
       type: 'datetime',
