@@ -11,7 +11,7 @@ import { Footer } from "@/components/sections/footer"
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background overflow-x-hidden">
       <Header />
       <HeroSection />
       <TopicsSection />

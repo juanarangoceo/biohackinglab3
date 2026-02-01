@@ -3,6 +3,9 @@ import { db } from '@/db'
 import { posts } from '@/db/schema'
 import { isNotNull } from 'drizzle-orm'
 
+// Revalidate sitemap every hour to include new posts
+export const revalidate = 3600
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://biohackinglab3.com'
   

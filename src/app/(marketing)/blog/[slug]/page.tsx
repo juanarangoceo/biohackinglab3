@@ -18,8 +18,7 @@ import { generateBlogPostMetadata } from "@/lib/seo/metadata"
 import { 
   generateArticleSchema, 
   generateFAQSchema, 
-  generateBreadcrumbSchema,
-  combineSchemas 
+  generateBreadcrumbSchema
 } from "@/lib/seo/schema"
 
 interface BlogPostPageProps {
@@ -164,31 +163,50 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </div>
       </div>
 
-      {/* Combined Structured Data */}
+      {/* Schema.org structured data */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(
-            combineSchemas(
-              generateArticleSchema({
-                title: post.title,
-                description: post.excerpt || undefined,
-                slug: post.slug,
-                publishedAt: post.publishedAt || undefined,
-                updatedAt: post.updatedAt || undefined,
-                category: post.category,
-                coverImage: post.coverImage || undefined,
-                content: typeof post.content === 'string' ? post.content : JSON.stringify(post.content),
-              }),
-              ...(faqData && faqData.length > 0 ? [generateFAQSchema(faqData)] : []),
-              generateBreadcrumbSchema([
-                { name: "Inicio", url: "/" },
-                { name: "Blog", url: "/blog" },
-                { name: post.category, url: `/blog?category=${post.category}` },
-                { name: post.title },
-              ])
-            )
-          ),
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            ...generateArticleSchema({
+              title: post.title,
+              description: post.excerpt || undefined,
+              slug: post.slug,
+              publishedAt: post.publishedAt || undefined,
+              updatedAt: post.updatedAt || undefined,
+              category: post.category,
+              coverImage: post.coverImage || undefined,
+              content: typeof post.content === 'string' ? post.content : JSON.stringify(post.content),
+            }),
+          }),
+        }}
+      />
+      
+      {faqData && faqData.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              ...generateFAQSchema(faqData),
+            }),
+          }}
+        />
+      )}
+      
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            ...generateBreadcrumbSchema([
+              { name: "Inicio", url: "/" },
+              { name: "Blog", url: "/blog" },
+              { name: post.category, url: `/blog?category=${post.category}` },
+              { name: post.title },
+            ]),
+          }),
         }}
       />
       

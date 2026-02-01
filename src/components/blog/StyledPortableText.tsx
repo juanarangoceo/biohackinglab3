@@ -70,6 +70,44 @@ const components: PortableTextComponents = {
       )
     },
   },
+  types: {
+    table: ({ value }: { value: any }) => {
+      const rows = value?.rows || []
+      
+      return (
+        <div className="my-8 overflow-x-auto rounded-lg border border-border shadow-sm">
+          <table className="w-full min-w-[600px] border-collapse bg-card">
+            <tbody>
+              {rows.map((row: any, rowIndex: number) => (
+                <tr 
+                  key={rowIndex}
+                  className={rowIndex === 0 ? "bg-primary/5 border-b-2 border-primary/20" : "border-b border-border hover:bg-muted/30 transition-colors"}
+                >
+                  {row.cells?.map((cell: string, cellIndex: number) => {
+                    const isHeader = rowIndex === 0
+                    const Tag = isHeader ? 'th' : 'td'
+                    
+                    return (
+                      <Tag
+                        key={cellIndex}
+                        className={`
+                          px-4 py-3 text-left
+                          ${isHeader ? 'font-bold text-foreground text-sm uppercase tracking-wide' : 'text-muted-foreground'}
+                          ${cellIndex === 0 ? 'font-semibold text-foreground' : ''}
+                        `}
+                      >
+                        {cell}
+                      </Tag>
+                    )
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )
+    },
+  },
 }
 
 export function StyledPortableText({ value }: { value: any }) {
