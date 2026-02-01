@@ -130,6 +130,48 @@ function markdownToPortableText(markdown: string) {
       continue
     }
     
+    // Table handling
+    if (line.trim().startsWith('|')) {
+      if (currentBlock) { blocks.push(currentBlock); currentBlock = null; }
+      listType = null
+
+      const rows: any[] = []
+      // Look ahead to capture the full table
+      let tableIndex = i;
+      while (tableIndex < lines.length) {
+        const lineStr = lines[tableIndex];
+        if (!lineStr || !lineStr.trim().startsWith('|')) break;
+        
+        const tableLine = lineStr.trim();
+        // Skip separator line (e.g. |---|---|)
+        if (!tableLine.match(/^\|\s*:?-+:?\s*\|/)) {
+          const cells = tableLine
+            .split('|')
+            .filter((cell, idx, arr) => idx > 0 && idx < arr.length - 1) // Remove first and last empty splits from leading/trailing pipes
+            .map(cell => cell.trim());
+          
+          rows.push({
+            _key: generateKey(),
+            _type: 'tableRow',
+            cells: cells
+          });
+        }
+        tableIndex++;
+      }
+      
+      if (rows.length > 0) {
+        blocks.push({
+          _key: generateKey(),
+          _type: 'table',
+          rows: rows
+        })
+      }
+      
+      // Advance the main loop index
+      i = tableIndex - 1;
+      continue;
+    }
+    
     // Bold text handling within normal paragraphs
     // Note: detailed mark parsing (bold, italic, link) inside generic text is complex manually.
     // For now, we support bold **text** stripping for cleaner text or simple span splitting?
@@ -154,7 +196,9 @@ function markdownToPortableText(markdown: string) {
       // If previous block was a list item, we DO NOT force append. 
       // But we handled lists by pushing immediately above. 
       // So currentBlock is only 'normal' or 'blockquote' here.
-      currentBlock.children[0].text += ' ' + processedLine
+      if (currentBlock && currentBlock.children && currentBlock.children[0]) {
+        currentBlock.children[0].text += ' ' + processedLine
+      }
     }
   }
   

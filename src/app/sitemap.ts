@@ -19,6 +19,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       })
       .from(posts)
       .where(isNotNull(posts.publishedAt))
+      .orderBy(posts.publishedAt)
 
     const blogPosts: MetadataRoute.Sitemap = allPosts.map((post) => ({
       url: `${baseUrl}/blog/${post.slug}`,
