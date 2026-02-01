@@ -26,7 +26,7 @@ function markdownToPortableText(markdown: string) {
   let listType: 'bullet' | 'number' | null = null
   
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i]
+    const line = lines[i] || ''
     const trimmedLine = line.trim() // Keep spaces for indentation checks if needed, but for now robust trim
     
     // Empty lines reset current blocks (except inside code blocks - simplified for now)
