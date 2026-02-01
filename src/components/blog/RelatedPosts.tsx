@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { db } from "@/db"
 import { posts } from "@/db/schema"
-import { eq, ne, desc } from "drizzle-orm"
+import { eq, ne, desc, and } from "drizzle-orm"
 import { ArrowRight, Clock } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -18,8 +18,12 @@ export async function RelatedPosts({ currentSlug, category }: RelatedPostsProps)
   let relatedPosts = await db
     .select()
     .from(posts)
-    .where(eq(posts.category, category))
-    .where(ne(posts.slug, currentSlug))
+    .where(
+      and(
+        eq(posts.category, category),
+        ne(posts.slug, currentSlug)
+      )
+    )
     .orderBy(desc(posts.publishedAt))
     .limit(3)
 
@@ -42,7 +46,7 @@ export async function RelatedPosts({ currentSlug, category }: RelatedPostsProps)
       <h2 className="mb-8 text-3xl font-bold">También podría interesarte</h2>
       
       <div className="grid gap-6 md:grid-cols-3">
-        {relatedPosts.map((post, index) => (
+        {relatedPosts.map((post: typeof posts.$inferSelect, index: number) => (
           <Link key={post.slug} href={`/blog/${post.slug}`}>
             <Card className="group h-full border-border/50 bg-card/50 transition-all hover:border-primary/50 hover:bg-card">
               <CardContent className="flex h-full flex-col p-6">
