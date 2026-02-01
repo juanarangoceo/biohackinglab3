@@ -45,7 +45,9 @@ const components: PortableTextComponents = {
   },
   marks: {
     strong: ({ children }: { children: React.ReactNode }) => (
-      <strong className="font-bold text-foreground">{children}</strong>
+      <strong className="font-bold text-primary bg-primary/10 px-1 rounded-sm shadow-sm decoration-clone box-decoration-clone">
+        {children}
+      </strong>
     ),
     code: ({ children }: { children: React.ReactNode }) => (
       <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-primary border border-border">

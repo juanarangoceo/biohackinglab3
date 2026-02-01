@@ -60,7 +60,7 @@ export function TableOfContents({ content }: TableOfContentsProps) {
   if (headings.length === 0) return null
 
   return (
-    <nav className="sticky top-24 hidden lg:block">
+    <nav className="">
       <div className="rounded-lg border border-border bg-card p-6">
         <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
           En este artículo

@@ -157,7 +157,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           </article>
 
           {/* Sidebar (Desktop only) */}
-          <aside className="hidden lg:block">
+          <aside className="hidden lg:block space-y-8 sticky top-24 h-fit self-start">
             <TableOfContents content={contentWithIds} />
             <NewsletterCard />
           </aside>

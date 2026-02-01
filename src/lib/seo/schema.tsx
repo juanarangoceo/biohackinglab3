@@ -5,7 +5,6 @@ import { seoConfig } from "./config"
  */
 export function generateOrganizationSchema() {
   return {
-    "@context": "https://schema.org",
     "@type": "Organization",
     "name": seoConfig.organization.name,
     "url": seoConfig.siteUrl,
@@ -19,7 +18,6 @@ export function generateOrganizationSchema() {
  */
 export function generateWebSiteSchema() {
   return {
-    "@context": "https://schema.org",
     "@type": "WebSite",
     "name": seoConfig.siteName,
     "url": seoConfig.siteUrl,
@@ -59,7 +57,6 @@ export function generateArticleSchema({
   const wordCount = content ? content.split(/\s+/).length : 0
 
   return {
-    "@context": "https://schema.org",
     "@type": "Article",
     "headline": title,
     "description": description || title,
@@ -96,7 +93,6 @@ export function generateArticleSchema({
  */
 export function generateFAQSchema(faqs: Array<{ question: string; answer: string }>) {
   return {
-    "@context": "https://schema.org",
     "@type": "FAQPage",
     "mainEntity": faqs.map((faq) => ({
       "@type": "Question",
@@ -114,7 +110,6 @@ export function generateFAQSchema(faqs: Array<{ question: string; answer: string
  */
 export function generateBreadcrumbSchema(items: Array<{ name: string; url?: string }>) {
   return {
-    "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": items.map((item, index) => ({
       "@type": "ListItem",
@@ -138,7 +133,6 @@ export function generateItemListSchema({
   items: Array<{ name: string; url: string; description?: string }>
 }) {
   return {
-    "@context": "https://schema.org",
     "@type": "ItemList",
     "name": name,
     "description": description,
