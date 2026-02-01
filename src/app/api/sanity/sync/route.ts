@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { db } from '@/db'
 import { posts } from '@/db/schema'
 
@@ -14,9 +15,11 @@ export async function POST(req: Request) {
       )
     }
 
+    const postSlug = slug.current || slug
+
     // Insert into Supabase with Upsert (onConflictDoUpdate)
     await db.insert(posts).values({
-      slug: slug.current || slug,
+      slug: postSlug,
       title,
       excerpt: excerpt || '',
       content: JSON.stringify(content),
@@ -33,10 +36,15 @@ export async function POST(req: Request) {
         content: JSON.stringify(content),
         category: category || 'general',
         faq: faq || null,
-        slug: slug.current || slug,
+        slug: postSlug,
         updatedAt: new Date(),
       }
     })
+
+    // Revalidate sitemap and blog pages to reflect new/updated post
+    revalidatePath('/sitemap.xml')
+    revalidatePath('/blog')
+    revalidatePath(`/blog/${postSlug}`)
 
     return NextResponse.json({ success: true })
   } catch (error) {

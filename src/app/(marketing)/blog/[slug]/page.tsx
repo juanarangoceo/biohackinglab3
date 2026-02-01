@@ -163,7 +163,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </div>
       </div>
 
-      {/* Schema.org structured data */}
+
       {/* Schema.org structured data */}
       <script
         type="application/ld+json"
