@@ -32,7 +32,7 @@ export function NewsletterCard() {
   }
 
   return (
-    <div className="sticky top-24 hidden lg:block mt-6">
+    <div className="mt-6">
       <div className="rounded-lg border border-primary/30 bg-gradient-to-br from-primary/10 to-purple-500/10 p-6">
         <div className="mb-4 flex items-center gap-2">
           <div className="rounded-full bg-primary/20 p-2">

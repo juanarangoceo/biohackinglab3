@@ -17,49 +17,131 @@ function generateKey() {
 }
 
 // Helper to convert markdown to Portable Text
+// Helper to convert markdown to Portable Text
 function markdownToPortableText(markdown: string) {
   const blocks: any[] = []
   const lines = markdown.split('\n')
   
   let currentBlock: any = null
+  let listType: 'bullet' | 'number' | null = null
   
-  for (const line of lines) {
-    if (line.trim() === '') {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]
+    const trimmedLine = line.trim() // Keep spaces for indentation checks if needed, but for now robust trim
+    
+    // Empty lines reset current blocks (except inside code blocks - simplified for now)
+    if (trimmedLine === '') {
       if (currentBlock) {
         blocks.push(currentBlock)
         currentBlock = null
       }
+      listType = null
       continue
     }
     
+    // H1
+    if (line.startsWith('# ')) {
+      if (currentBlock) { blocks.push(currentBlock); currentBlock = null; }
+      listType = null
+      blocks.push({
+        _key: generateKey(),
+        _type: 'block',
+        style: 'h1',
+        children: [{ _key: generateKey(), _type: 'span', text: line.replace('# ', '').trim() }],
+      })
+      continue
+    }
+
     // H2
     if (line.startsWith('## ')) {
-      if (currentBlock) blocks.push(currentBlock)
+      if (currentBlock) { blocks.push(currentBlock); currentBlock = null; }
+      listType = null
       blocks.push({
         _key: generateKey(),
         _type: 'block',
         style: 'h2',
-        children: [{ _key: generateKey(), _type: 'span', text: line.replace('## ', '') }],
+        children: [{ _key: generateKey(), _type: 'span', text: line.replace('## ', '').trim() }],
       })
-      currentBlock = null
       continue
     }
     
     // H3
     if (line.startsWith('### ')) {
-      if (currentBlock) blocks.push(currentBlock)
+      if (currentBlock) { blocks.push(currentBlock); currentBlock = null; }
+      listType = null
       blocks.push({
         _key: generateKey(),
         _type: 'block',
         style: 'h3',
-        children: [{ _key: generateKey(), _type: 'span', text: line.replace('### ', '') }],
+        children: [{ _key: generateKey(), _type: 'span', text: line.replace('### ', '').trim() }],
       })
-      currentBlock = null
+      continue
+    }
+
+    // Blockquote
+    if (line.startsWith('> ')) {
+      if (currentBlock && currentBlock.style !== 'blockquote') { blocks.push(currentBlock); currentBlock = null; }
+      listType = null
+      
+      const text = line.replace('> ', '').trim()
+      
+      if (currentBlock && currentBlock.style === 'blockquote') {
+         currentBlock.children[0].text += ' ' + text
+      } else {
+        currentBlock = {
+          _key: generateKey(),
+          _type: 'block',
+          style: 'blockquote',
+          children: [{ _key: generateKey(), _type: 'span', text: text }],
+        }
+      }
+      continue
+    }
+
+    // Unordered List (- or *)
+    if (line.match(/^(\*|-)\s/)) {
+      if (currentBlock) { blocks.push(currentBlock); currentBlock = null; }
+      
+      const text = line.replace(/^(\*|-)\s/, '').trim()
+      blocks.push({
+        _key: generateKey(),
+        _type: 'block',
+        listItem: 'bullet',
+        level: 1,
+        style: 'normal',
+        children: [{ _key: generateKey(), _type: 'span', text: text }],
+      })
+      continue
+    }
+
+    // Ordered List (1. )
+    if (line.match(/^\d+\.\s/)) {
+      if (currentBlock) { blocks.push(currentBlock); currentBlock = null; }
+      
+      const text = line.replace(/^\d+\.\s/, '').trim()
+      blocks.push({
+        _key: generateKey(),
+        _type: 'block',
+        listItem: 'number',
+        level: 1,
+        style: 'normal',
+        children: [{ _key: generateKey(), _type: 'span', text: text }],
+      })
       continue
     }
     
-    // Bold text
-    const processedLine = line.replace(/\*\*(.*?)\*\*/g, (_, text) => text)
+    // Bold text handling within normal paragraphs
+    // Note: detailed mark parsing (bold, italic, link) inside generic text is complex manually.
+    // For now, we support bold **text** stripping for cleaner text or simple span splitting?
+    // The previous implementation was: text: processedLine. 
+    // We will keep the text as is but ideally PortableText handles simple marks if we just pass text... 
+    // Wait, PortableText needs `marks` array on spans.
+    // The previous implementation replaced ** with nothing? No, `(_, text) => text`. It STRIPPED bold markers.
+    // Let's improve: keep them stripped but ideally we want BOLD. 
+    // Since implementing a full tokenizer is risky here, let's Stick to the previous "strip markers" strategy 
+    // BUT correctly identify paragraphs vs lists.
+    
+    const processedLine = line.replace(/\*\*(.*?)\*\*/g, '$1') // Strip bold markers for now to avoid ** showing up
     
     if (!currentBlock) {
       currentBlock = {
@@ -69,6 +151,9 @@ function markdownToPortableText(markdown: string) {
         children: [{ _key: generateKey(), _type: 'span', text: processedLine }],
       }
     } else {
+      // If previous block was a list item, we DO NOT force append. 
+      // But we handled lists by pushing immediately above. 
+      // So currentBlock is only 'normal' or 'blockquote' here.
       currentBlock.children[0].text += ' ' + processedLine
     }
   }

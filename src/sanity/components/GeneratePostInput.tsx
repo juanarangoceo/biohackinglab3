@@ -52,7 +52,7 @@ export function GeneratePostInput(props: StringInputProps) {
         })
 
         // CRITICAL: Sync to Supabase so it appears on the blog page
-        await fetch('/api/sanity/sync', {
+        const syncResponse = await fetch('/api/sanity/sync', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -62,10 +62,16 @@ export function GeneratePostInput(props: StringInputProps) {
             excerpt: doc.excerpt,
             content: doc.content,
             category: doc.category,
+            faq: doc.faq,
             aiGenerated: doc.aiGenerated,
             publishedAt: doc.publishedAt,
           }),
         })
+
+        if (!syncResponse.ok) {
+          const errorData = await syncResponse.text() // Get text response in case it's not JSON
+          throw new Error(`Error de sincronización (Supabase): ${syncResponse.status} ${syncResponse.statusText} - ${errorData.substring(0, 100)}`)
+        }
 
         setSuccess(true)
         setError(null)
