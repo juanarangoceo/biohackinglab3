@@ -43,8 +43,9 @@ export const SINGLE_SHOT_BLOG_PROMPT = (topic: string, additionalPrompt?: string
   - Usa palabras clave long-tail para SEO
   - Formato de pregunta: "¿Cómo...", "¿Qué es...", "¿Por qué...", "¿Cuándo..."
 
-  REFERENCIAS CIENTÍFICAS (CRÍTICO PARA E-E-A-T):
-  - Genera entre 3-5 referencias de estudios científicos REALES
+  REFERENCIAS CIENTÍFICAS (OBLIGATORIO - SISTEMA CRÍTICO):
+  - DEBES generar un array "references" con exactamente 3 a 5 estudios.
+  - El sistema fallará si este campo no existe o está vacío.
   - Prioriza estudios de PubMed, Nature, Science, JAMA, The Lancet
   - Incluye DOI cuando sea posible
   - Las URLs deben ser a estudios reales (verifica que existan)
