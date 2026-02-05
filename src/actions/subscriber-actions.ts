@@ -15,6 +15,7 @@ export type ActionResponse<T = any> = {
 
 export async function subscribeUser(data: NewSubscriber): Promise<ActionResponse> {
   try {
+    console.log("📝 Attempting subscription for:", data.email);
     // 1. Validation
     const validatedFields = insertSubscriberSchema.safeParse(data);
 
