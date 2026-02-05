@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { Space_Grotesk, Manrope } from "next/font/google";
 import "./globals.css";
 
@@ -32,6 +33,7 @@ export default function RootLayout({
       >
         {children}
       </body>
+      <GoogleAnalytics gaId="G-31VBCT0DMN" />
     </html>
   );
 }
