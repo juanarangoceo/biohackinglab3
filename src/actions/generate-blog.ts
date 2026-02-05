@@ -252,7 +252,7 @@ export async function generateBlogFromTopic(
         generatedData = JSON.parse(cleanJson);
     }
 
-    const { title, content, excerpt, category, faq } = generatedData;
+    const { title, content, excerpt, category, faq, references } = generatedData;
 
     if (!title || !content) {
         throw new Error('Incomplete JSON response');
@@ -278,6 +278,7 @@ export async function generateBlogFromTopic(
         excerpt,
         category: category?.toLowerCase() || 'longevidad',
         faq: faq || [],
+        references: references || [],
         aiGenerated: true,
         publishedAt: new Date().toISOString(),
       }

@@ -16,6 +16,16 @@ export const SINGLE_SHOT_BLOG_PROMPT = (topic: string, additionalPrompt?: string
         "question": "¿Pregunta frecuente relevante al tema?",
         "answer": "Respuesta detallada y completa (2-3 párrafos)"
       }
+    ],
+    "references": [
+      {
+        "title": "Título del estudio científico",
+        "authors": "Apellido A, Apellido B, et al.",
+        "journal": "Nombre de la revista científica",
+        "year": 2023,
+        "url": "https://pubmed.ncbi.nlm.nih.gov/...",
+        "doi": "10.1234/ejemplo"
+      }
     ]
   }
 
@@ -32,6 +42,14 @@ export const SINGLE_SHOT_BLOG_PROMPT = (topic: string, additionalPrompt?: string
   - Las respuestas deben ser completas (150-200 palabras cada una)
   - Usa palabras clave long-tail para SEO
   - Formato de pregunta: "¿Cómo...", "¿Qué es...", "¿Por qué...", "¿Cuándo..."
+
+  REFERENCIAS CIENTÍFICAS (CRÍTICO PARA E-E-A-T):
+  - Genera entre 3-5 referencias de estudios científicos REALES
+  - Prioriza estudios de PubMed, Nature, Science, JAMA, The Lancet
+  - Incluye DOI cuando sea posible
+  - Las URLs deben ser a estudios reales (verifica que existan)
+  - Cita estudios de los últimos 5 años preferentemente
+  - Asegúrate de que las referencias respalden las afirmaciones del artículo
 
   TONO: Científico, empoderador, directo, "tú" en lugar de "usted".
   IMPORTANTE: Responde ÚNICAMENTE con el JSON válido.

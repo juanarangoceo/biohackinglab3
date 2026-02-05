@@ -29,6 +29,7 @@ export const posts = pgTable("posts", {
   sanityId: varchar("sanity_id", { length: 255 }).unique(), // Link to Sanity CMS document
   aiGenerated: boolean("ai_generated").default(false).notNull(), // Track AI-generated content
   faq: jsonb("faq").$type<Array<{ question: string; answer: string }>>(), // FAQ section for SEO
+  references: jsonb("references").$type<Array<{ title: string; authors?: string; journal?: string; year?: number; url: string; doi?: string }>>(), // Scientific references for E-E-A-T
   seoTags: jsonb("seo_tags").$type<{ title: string; description: string; keywords: string[] }>().default({ title: "", description: "", keywords: [] }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

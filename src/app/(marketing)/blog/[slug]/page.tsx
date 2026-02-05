@@ -14,6 +14,8 @@ import { FAQSection } from "@/components/blog/FAQSection"
 import { RelatedPosts } from "@/components/blog/RelatedPosts"
 import { NewsletterCard } from "@/components/blog/NewsletterCard"
 import { StyledPortableText } from "@/components/blog/StyledPortableText"
+import { MedicalDisclaimer } from "@/components/blog/MedicalDisclaimer"
+import { References } from "@/components/blog/References"
 import { generateBlogPostMetadata } from "@/lib/seo/metadata"
 import { 
   generateArticleSchema, 
@@ -140,6 +142,16 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <div className="max-w-none">
               <StyledPortableText value={contentWithIds} />
             </div>
+
+            {/* Medical Disclaimer */}
+            <div className="mt-8">
+              <MedicalDisclaimer />
+            </div>
+
+            {/* References */}
+            {post.references && Array.isArray(post.references) && post.references.length > 0 && (
+              <References references={post.references as any} />
+            )}
 
             {/* FAQ Section */}
             {faqData && faqData.length > 0 && (
