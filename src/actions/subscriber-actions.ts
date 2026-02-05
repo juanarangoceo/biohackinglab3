@@ -48,13 +48,16 @@ export async function subscribeUser(data: NewSubscriber): Promise<ActionResponse
       source: source || "website",
       status: "active"
     });
+    
+    console.log("✅ Successfully inserted subscriber:", email);
 
     // 4. Revalidate
     revalidatePath("/");
 
     return { success: true, data: { message: "Successfully subscribed" } };
   } catch (error) {
-    console.error("Subscription Error:", error);
+    console.error("❌ Subscription Error:", error);
+    console.error("Error details:", JSON.stringify(error, null, 2));
     return {
       success: false,
       error: "Failed to subscribe. Please try again later.",

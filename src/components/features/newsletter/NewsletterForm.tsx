@@ -31,17 +31,28 @@ export function NewsletterForm() {
   });
 
   function onSubmit(data: NewSubscriber) {
+    console.log("🔵 Form submitted with data:", data);
     startTransition(async () => {
-      const result = await subscribeUser(data);
+      try {
+        console.log("🔵 Calling subscribeUser...");
+        const result = await subscribeUser(data);
+        console.log("🔵 subscribeUser result:", result);
 
-      if (result.success) {
-        toast.success("Welcome to the Lab!", {
-          description: result.data?.message || "You have successfully subscribed.",
-        });
-        form.reset();
-      } else {
+        if (result.success) {
+          toast.success("Welcome to the Lab!", {
+            description: result.data?.message || "You have successfully subscribed.",
+          });
+          form.reset();
+        } else {
+          console.error("❌ Subscription failed:", result.error);
+          toast.error("Subscription failed", {
+            description: result.error || "Please try again later.",
+          });
+        }
+      } catch (error) {
+        console.error("❌ Exception in onSubmit:", error);
         toast.error("Subscription failed", {
-          description: result.error || "Please try again later.",
+          description: "An unexpected error occurred.",
         });
       }
     });
