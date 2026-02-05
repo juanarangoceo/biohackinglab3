@@ -2,10 +2,11 @@
 
 import React from "react"
 
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import { Mail, ArrowRight, Sparkles, Shield, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { subscribeUser } from "@/actions/subscriber-actions"
 
 const guarantees = [
   { icon: Shield, text: "0% spam, 100% valor" },
@@ -15,7 +16,7 @@ const guarantees = [
 
 export function NewsletterSection() {
   const [email, setEmail] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isPending, startTransition] = useTransition()
   const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState("")
 
@@ -28,14 +29,23 @@ export function NewsletterSection() {
       return
     }
 
-    setIsSubmitting(true)
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    setIsSubmitting(false)
-    setIsSuccess(true)
-    setEmail("")
+    startTransition(async () => {
+      console.log("🔵 NewsletterSection submitting:", email);
+      const result = await subscribeUser({ 
+        email, 
+        source: "website_newsletter_section",
+        tags: ["newsletter"]
+      });
+      
+      console.log("🔵 NewsletterSection result:", result);
+      
+      if (result.success) {
+        setIsSuccess(true)
+        setEmail("")
+      } else {
+        setError(result.error || "Error al suscribirse")
+      }
+    });
   }
 
   return (
@@ -88,10 +98,10 @@ export function NewsletterSection() {
                 <Button 
                   type="submit" 
                   size="lg"
-                  disabled={isSubmitting}
+                  disabled={isPending}
                   className="h-12 gap-2 whitespace-nowrap"
                 >
-                  {isSubmitting ? (
+                  {isPending ? (
                     "Enviando..."
                   ) : (
                     <>

@@ -1,34 +1,36 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import { Mail, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { subscribeUser } from "@/actions/subscriber-actions"
 
 export function NewsletterCard() {
   const [email, setEmail] = useState("")
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
+  const [isPending, startTransition] = useTransition()
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setStatus("loading")
 
-    try {
-      const response = await fetch("/api/newsletter/subscribe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      })
+    startTransition(async () => {
+      console.log("🔵 NewsletterCard submitting:", email);
+      const result = await subscribeUser({ 
+        email,
+        source: "blog_newsletter_card",
+        tags: ["newsletter", "blog"]
+      });
+      
+      console.log("🔵 NewsletterCard result:", result);
 
-      if (response.ok) {
+      if (result.success) {
         setStatus("success")
         setEmail("")
       } else {
         setStatus("error")
       }
-    } catch (error) {
-      setStatus("error")
-    }
+    });
   }
 
   return (
@@ -62,9 +64,9 @@ export function NewsletterCard() {
             <Button
               type="submit"
               className="w-full"
-              disabled={status === "loading"}
+              disabled={isPending}
             >
-              {status === "loading" ? (
+              {isPending ? (
                 "Suscribiendo..."
               ) : (
                 <>
