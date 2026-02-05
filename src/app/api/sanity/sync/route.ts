@@ -6,7 +6,7 @@ import { posts } from '@/db/schema'
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { _id, title, slug, excerpt, content, category, faq, aiGenerated, publishedAt } = body
+    const { _id, title, slug, excerpt, content, category, faq, references, aiGenerated, publishedAt } = body
 
     if (!_id || !slug || !title) {
       return NextResponse.json(
@@ -25,6 +25,7 @@ export async function POST(req: Request) {
       content: JSON.stringify(content),
       category: category || 'general',
       faq: faq || null,
+      references: references || null,
       sanityId: _id,
       aiGenerated: aiGenerated || false,
       publishedAt: publishedAt ? new Date(publishedAt) : new Date(),
@@ -36,6 +37,7 @@ export async function POST(req: Request) {
         content: JSON.stringify(content),
         category: category || 'general',
         faq: faq || null,
+        references: references || null,
         slug: postSlug,
         updatedAt: new Date(),
       }
