@@ -119,8 +119,23 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 </p>
               )}
               
+              {/* Author Info */}
+              <div className="flex items-center gap-3 mb-6">
+                 <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+                    {post.author ? post.author.charAt(0) : "J"}
+                 </div>
+                 <div>
+                    <p className="font-semibold text-foreground leading-none">
+                      {post.author || "Juan Arango"}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {post.authorRole || "Editor en Jefe"}
+                    </p>
+                 </div>
+              </div>
+
               {post.publishedAt && (
-                <time className="text-sm text-muted-foreground">
+                <time className="text-sm text-muted-foreground block mb-4">
                   Publicado el {format(new Date(post.publishedAt), "d 'de' MMMM, yyyy", { locale: es })}
                 </time>
               )}

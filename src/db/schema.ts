@@ -28,6 +28,8 @@ export const posts = pgTable("posts", {
   category: varchar("category", { length: 50 }).notNull(), // Nootropics, Sleep, etc.
   sanityId: varchar("sanity_id", { length: 255 }).unique(), // Link to Sanity CMS document
   aiGenerated: boolean("ai_generated").default(false).notNull(), // Track AI-generated content
+  author: varchar("author", { length: 255 }).default("Juan Arango"), // E-E-A-T: Explicit author
+  authorRole: varchar("author_role", { length: 255 }).default("Editor en Jefe"), // E-E-A-T: Credibility
   faq: jsonb("faq").$type<Array<{ question: string; answer: string }>>(), // FAQ section for SEO
   references: jsonb("references").$type<Array<{ title: string; authors?: string; journal?: string; year?: number; url: string; doi?: string }>>(), // Scientific references for E-E-A-T
   seoTags: jsonb("seo_tags").$type<{ title: string; description: string; keywords: string[] }>().default({ title: "", description: "", keywords: [] }),

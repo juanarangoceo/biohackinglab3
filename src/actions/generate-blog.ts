@@ -280,6 +280,8 @@ export async function generateBlogFromTopic(
         faq: faq || [],
         references: references || [],
         aiGenerated: true,
+        author: "Juan Arango",
+        authorRole: "Editor en Jefe",
         publishedAt: new Date().toISOString(),
       }
     }

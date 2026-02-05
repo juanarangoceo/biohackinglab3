@@ -27,9 +27,9 @@ const Footer = () => {
              <h4 className="font-bold mb-4 font-display">Explore</h4>
              <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><Link href="/blog" className="hover:text-primary transition-colors">Blog</Link></li>
-                <li><Link href="/apps" className="hover:text-primary transition-colors">Apps Directory</Link></li>
-                <li><Link href="/about" className="hover:text-primary transition-colors">About Us</Link></li>
-                <li><Link href="/editorial-policy" className="hover:text-primary transition-colors">Editorial Policy</Link></li>
+                <li><Link href="/apps" className="hover:text-primary transition-colors">Directorio de Apps</Link></li>
+                <li><Link href="/about" className="hover:text-primary transition-colors">Sobre Nosotros</Link></li>
+                <li><Link href="/editorial-policy" className="hover:text-primary transition-colors">Política Editorial</Link></li>
              </ul>
           </div>
 

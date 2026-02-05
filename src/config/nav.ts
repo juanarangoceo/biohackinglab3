@@ -6,10 +6,9 @@ export const siteConfig = {
 }
 
 export const marketingNav = [
-  { name: "Home", href: "/" },
+  { name: "Inicio", href: "/" },
   { name: "Blog", href: "/blog" },
   { name: "Apps", href: "/apps" },
-  { name: "About", href: "/about" },
 ]
 
 export const dashboardNav = [
