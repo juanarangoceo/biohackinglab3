@@ -33,6 +33,14 @@ export default defineType({
       description: 'Se genera automáticamente. Puedes editarlo después.',
     }),
     defineField({
+      name: 'author',
+      title: 'Author',
+      type: 'reference',
+      to: [{ type: 'author' }],
+      validation: (Rule) => Rule.required(),
+      description: 'Autor del artículo (requerido para E-E-A-T)',
+    }),
+    defineField({
       name: 'content',
       title: 'Content',
       type: 'array',
@@ -158,6 +166,57 @@ export default defineType({
         },
       ],
       description: 'Se genera automáticamente por IA. Puedes editar o agregar más preguntas.',
+    }),
+    defineField({
+      name: 'references',
+      title: 'Referencias Científicas',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            {
+              name: 'title',
+              title: 'Título del Estudio',
+              type: 'string',
+              validation: (Rule) => Rule.required(),
+            },
+            {
+              name: 'authors',
+              title: 'Autores',
+              type: 'string',
+            },
+            {
+              name: 'journal',
+              title: 'Revista/Publicación',
+              type: 'string',
+            },
+            {
+              name: 'year',
+              title: 'Año',
+              type: 'number',
+            },
+            {
+              name: 'url',
+              title: 'URL',
+              type: 'url',
+              validation: (Rule) => Rule.required(),
+            },
+            {
+              name: 'doi',
+              title: 'DOI',
+              type: 'string',
+            },
+          ],
+          preview: {
+            select: {
+              title: 'title',
+              subtitle: 'journal',
+            },
+          },
+        },
+      ],
+      description: 'Referencias científicas que respaldan el contenido del artículo',
     }),
     defineField({
       name: 'publishedAt',

@@ -32,6 +32,33 @@ export default function RootLayout({
         className={`${spaceGrotesk.variable} ${manrope.variable} antialiased`}
       >
         {children}
+        
+        {/* Organization Schema for E-E-A-T */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "Biohacking Lab 3.0",
+              "url": "https://biohackinglab3.com",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://biohackinglab3.com/logo.png"
+              },
+              "description": "Plataforma líder en biohacking, longevidad y optimización del rendimiento humano",
+              "sameAs": [
+                "https://twitter.com/biohackinglab",
+                "https://instagram.com/biohackinglab"
+              ],
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "Customer Service",
+                "email": "contacto@biohackinglab3.com"
+              }
+            }),
+          }}
+        />
       </body>
       <GoogleAnalytics gaId="G-31VBCT0DMN" />
     </html>
