@@ -24,7 +24,17 @@ export function Breadcrumbs({ category, title }: BreadcrumbsProps) {
 
   return (
     <>
-      <nav aria-label="Breadcrumb" className="mb-8">
+      <div className="mb-6">
+         <Link 
+            href="/blog"
+            className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors hover:translate-x-[-4px] duration-200"
+         >
+            <ChevronRight className="h-4 w-4 rotate-180" />
+            Volver al Blog
+         </Link>
+      </div>
+
+      <nav aria-label="Breadcrumb" className="mb-8 hidden md:block">
         <ol className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground/80 font-medium">
           {breadcrumbItems.map((item, index) => (
             <li key={item.href} className="flex items-center gap-2">
