@@ -16,7 +16,7 @@ const footerLinks = {
   legal: [
     { label: "Privacidad", href: "/legal/privacy" },
     { label: "Términos", href: "/legal/terms" },
-    { label: "Contacto", href: "#newsletter" },
+    { label: "Contacto", href: "/contact" },
   ]
 }
 

@@ -1,38 +1,38 @@
 import React from 'react'
 import { PortableText as PortableTextReact, PortableTextComponents, PortableTextComponentProps, PortableTextMarkComponentProps } from "@portabletext/react"
 
+// Helper to parse markdown-style bold/italic if children is a string or array of strings
+const renderMarkdownChildren = (content: React.ReactNode): React.ReactNode => {
+  if (typeof content !== 'string') {
+      // If it's an array, map over it. If it's complex objects, return as is.
+      if (Array.isArray(content)) {
+        return content.map((child, i) => <React.Fragment key={i}>{renderMarkdownChildren(child)}</React.Fragment>)
+      }
+      return content
+  }
+
+  // Split by **bold** first
+  const parts = content.split(/(\*\*.*?\*\*)/g)
+  return parts.map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={index} className="font-bold text-foreground">{part.slice(2, -2)}</strong>
+    }
+    // Then split by *italic*
+    const subParts = part.split(/(\*.*?\*)/g)
+    return subParts.map((subPart, subIndex) => {
+        if (subPart.startsWith('*') && subPart.endsWith('*') && subPart.length > 2) {
+          return <em key={`${index}-${subIndex}`} className="italic">{subPart.slice(1, -1)}</em>
+        }
+        return subPart
+    })
+  })
+}
+
 const components: PortableTextComponents = {
   block: {
-    normal: ({ children }: PortableTextComponentProps<any>) => {
-      // Helper to parse markdown-style bold/italic if children is a string or array of strings
-      const renderChildren = (content: React.ReactNode) => {
-        if (typeof content !== 'string') {
-           // If it's an array, map over it. If it's complex objects, return as is.
-           if (Array.isArray(content)) {
-             return content.map((child, i) => <React.Fragment key={i}>{renderChildren(child)}</React.Fragment>)
-           }
-           return content
-        }
-
-        // Split by **bold** first
-        const parts = content.split(/(\*\*.*?\*\*)/g)
-        return parts.map((part, index) => {
-          if (part.startsWith('**') && part.endsWith('**')) {
-             return <strong key={index} className="font-bold text-foreground">{part.slice(2, -2)}</strong>
-          }
-          // Then split by *italic*
-          const subParts = part.split(/(\*.*?\*)/g)
-          return subParts.map((subPart, subIndex) => {
-             if (subPart.startsWith('*') && subPart.endsWith('*') && subPart.length > 2) {
-                return <em key={`${index}-${subIndex}`} className="italic">{subPart.slice(1, -1)}</em>
-             }
-             return subPart
-          })
-        })
-      }
-
-      return <p className="mb-6 leading-relaxed text-muted-foreground text-lg">{renderChildren(children)}</p>
-    },
+    normal: ({ children }: PortableTextComponentProps<any>) => (
+      <p className="mb-6 leading-relaxed text-muted-foreground text-lg">{renderMarkdownChildren(children)}</p>
+    ),
     h1: ({ children, value }: PortableTextComponentProps<any>) => (
       <h1 
         id={value?._key} 
@@ -69,6 +69,14 @@ const components: PortableTextComponents = {
     ),
     number: ({ children }: PortableTextComponentProps<any>) => (
       <ol className="list-decimal pl-6 space-y-3 my-6 text-muted-foreground marker:text-primary/70 font-medium">{children}</ol>
+    ),
+  },
+  listItem: {
+    bullet: ({ children }: PortableTextComponentProps<any>) => (
+      <li>{renderMarkdownChildren(children)}</li>
+    ),
+    number: ({ children }: PortableTextComponentProps<any>) => (
+      <li>{renderMarkdownChildren(children)}</li>
     ),
   },
   marks: {
