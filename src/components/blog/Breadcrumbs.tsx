@@ -27,9 +27,11 @@ export function Breadcrumbs({ category, title }: BreadcrumbsProps) {
       <div className="mb-6">
          <Link 
             href="/blog"
-            className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors hover:translate-x-[-4px] duration-200"
+            className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors hover:translate-x-[-4px] duration-200 py-2 px-1 -ml-1"
          >
-            <ChevronRight className="h-4 w-4 rotate-180" />
+            <div className="bg-muted rounded-full p-1.5 ">
+               <ChevronRight className="h-4 w-4 rotate-180" />
+            </div>
             Volver al Blog
          </Link>
       </div>

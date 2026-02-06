@@ -183,21 +183,59 @@ function markdownToPortableText(markdown: string) {
     // Since implementing a full tokenizer is risky here, let's Stick to the previous "strip markers" strategy 
     // BUT correctly identify paragraphs vs lists.
     
-    const processedLine = line.replace(/\*\*(.*?)\*\*/g, '$1') // Strip bold markers for now to avoid ** showing up
+    // Parse bold and italic marks
+    // We split by **bold** first
+    const parts = line.split(/(\*\*.*?\*\*)/g)
+    const children: any[] = []
     
+    parts.forEach(part => {
+       if (part.startsWith('**') && part.endsWith('**')) {
+          children.push({ 
+             _key: generateKey(), 
+             _type: 'span', 
+             marks: ['strong'], 
+             text: part.slice(2, -2) 
+          })
+       } else {
+          // Then split by *italic* (simple check, assuming no nested ** inside *)
+          const subParts = part.split(/(\*.*?\*)/g)
+          subParts.forEach(subPart => {
+             if (subPart.startsWith('*') && subPart.endsWith('*') && subPart.length > 2) {
+                 children.push({ 
+                   _key: generateKey(), 
+                   _type: 'span', 
+                   marks: ['em'], 
+                   text: subPart.slice(1, -1) 
+                 })
+             } else {
+                 if (subPart) {
+                    children.push({ 
+                       _key: generateKey(), 
+                       _type: 'span', 
+                       text: subPart 
+                    })
+                 }
+             }
+          })
+       }
+    })
+
+    if (children.length === 0) continue // Empty line or just markers?
+
     if (!currentBlock) {
       currentBlock = {
         _key: generateKey(),
         _type: 'block',
         style: 'normal',
-        children: [{ _key: generateKey(), _type: 'span', text: processedLine }],
+        children: children,
       }
     } else {
-      // If previous block was a list item, we DO NOT force append. 
-      // But we handled lists by pushing immediately above. 
-      // So currentBlock is only 'normal' or 'blockquote' here.
-      if (currentBlock && currentBlock.children && currentBlock.children[0]) {
-        currentBlock.children[0].text += ' ' + processedLine
+      // Append to previous block if it's normal/blockquote
+      // Note: merging children is tricky if we want to add a space. 
+      // Simplified: if extending a block, we add a space span first.
+      if (currentBlock && currentBlock.children) {
+         currentBlock.children.push({ _key: generateKey(), _type: 'span', text: ' ' })
+         children.forEach(child => currentBlock.children.push(child))
       }
     }
   }
