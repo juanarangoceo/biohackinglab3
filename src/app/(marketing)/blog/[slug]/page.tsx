@@ -95,7 +95,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     <main className="min-h-screen bg-background">
       <Header />
       
-      <div className="container mx-auto px-4 py-12 max-w-7xl">
+      <div className="container mx-auto px-4 pt-24 pb-12 max-w-7xl">
         <Breadcrumbs category={post.category} title={post.title} />
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
