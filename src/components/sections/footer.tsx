@@ -14,9 +14,9 @@ const footerLinks = {
     { label: "Nutrición", href: "/blog?tag=nutricion" },
   ],
   legal: [
-    { label: "Privacidad", href: "/privacidad" },
-    { label: "Términos", href: "/terminos" },
-    { label: "Contacto", href: "/contacto" },
+    { label: "Privacidad", href: "/legal/privacy" },
+    { label: "Términos", href: "/legal/terms" },
+    { label: "Contacto", href: "#newsletter" },
   ]
 }
 
