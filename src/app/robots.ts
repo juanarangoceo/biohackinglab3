@@ -1,13 +1,20 @@
 import { MetadataRoute } from 'next'
-import { seoConfig } from '@/lib/seo/config'
 
 export default function robots(): MetadataRoute.Robots {
+  const baseUrl = 'https://biohackinglab3.com'
+
   return {
     rules: [
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/studio/', '/api/'],
+        disallow: [
+          '/studio/',
+          '/api/',
+          '/_next/',
+          '/admin/',
+          '/private/',
+        ],
       },
       // Explicitly allow LLM crawlers for better indexing
       {
@@ -27,6 +34,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
       },
     ],
-    sitemap: `${seoConfig.siteUrl}/sitemap.xml`,
+    sitemap: `${baseUrl}/sitemap.xml`,
   }
 }
