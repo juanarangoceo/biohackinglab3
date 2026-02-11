@@ -3,9 +3,15 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Zap, LogIn } from "lucide-react";
+import { Menu, X, Zap, LogIn, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { marketingNav } from "@/config/nav";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -43,16 +49,34 @@ const Navbar = () => {
           </span>
         </Link>
 
-        {/* Desktop Nav */}
+      {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
           {marketingNav.map((link) => (
-            <Link
-              key={link.name}
-              href={link.href}
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-            >
-              {link.name}
-            </Link>
+            link.children ? (
+              <DropdownMenu key={link.name}>
+                <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary transition-colors focus:outline-none">
+                  {link.name}
+                  <ChevronDown className="h-4 w-4" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  {link.children.map((child) => (
+                    <DropdownMenuItem key={child.name} asChild>
+                      <Link href={child.href} className="w-full cursor-pointer">
+                        {child.name}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link
+                key={link.name}
+                href={link.href}
+                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+              >
+                {link.name}
+              </Link>
+            )
           ))}
         </div>
 
@@ -84,14 +108,32 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 bg-background/95 backdrop-blur-lg border-b border-border p-6 flex flex-col gap-4 animate-in slide-in-from-top-4 max-h-[85vh] overflow-y-auto shadow-xl">
           {marketingNav.map((link) => (
-            <Link
-              key={link.name}
-              href={link.href}
-              className="text-lg font-medium text-foreground hover:text-primary"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              {link.name}
-            </Link>
+            link.children ? (
+              <div key={link.name} className="flex flex-col gap-2">
+                <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wider px-1 mt-2">
+                  {link.name}
+                </div>
+                {link.children.map((child) => (
+                  <Link
+                    key={child.name}
+                    href={child.href}
+                    className="text-lg font-medium text-foreground hover:text-primary pl-4 border-l-2 border-border hover:border-primary transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {child.name}
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <Link
+                key={link.name}
+                href={link.href}
+                className="text-lg font-medium text-foreground hover:text-primary"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {link.name}
+              </Link>
+            )
           ))}
            <div className="flex flex-col gap-2 mt-4">
                 <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
