@@ -11,15 +11,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { BlogPagination } from "./BlogPagination"
-
-const categories = [
-  { id: "all", label: "Todos" },
-  { id: "nootropicos", label: "Nootrópicos" },
-  { id: "sueno", label: "Sueño" },
-  { id: "longevidad", label: "Longevidad" },
-  { id: "nutricion", label: "Nutrición" },
-  { id: "fitness", label: "Fitness" },
-]
+import { topics } from "@/config/topics"
 
 interface BlogPost {
   id: string
@@ -52,6 +44,12 @@ export function BlogGrid({ posts, currentPage, totalPages, activeCategory }: Blo
   const featuredPosts = currentPage === 1 ? posts.slice(0, 2) : []
   const regularPosts = currentPage === 1 ? posts.slice(2) : posts
 
+  // Create filters list: "Todos" + topics from config
+  const filters = [
+    { slug: "all", title: "Todos" },
+    ...topics.map(t => ({ slug: t.slug, title: t.title }))
+  ]
+
   return (
     <section className="pt-32 pb-12">
       <div className="mx-auto max-w-7xl px-6">
@@ -72,19 +70,19 @@ export function BlogGrid({ posts, currentPage, totalPages, activeCategory }: Blo
 
         {/* Category Filters */}
         <div className="mb-10 flex flex-wrap justify-center gap-2">
-          {categories.map((category) => (
+          {filters.map((category) => (
             <Link
-              key={category.id}
-              href={`/blog?category=${category.id}`}
+              key={category.slug}
+              href={`/blog?category=${category.slug}`}
             >
               <button
                 className={`rounded-full px-4 py-2 font-mono text-sm font-medium transition-all ${
-                  activeCategory === category.id
+                  activeCategory === category.slug
                     ? "bg-primary text-primary-foreground"
                     : "bg-secondary text-muted-foreground hover:bg-secondary/80 hover:text-foreground"
                 }`}
               >
-                {category.label}
+                {category.title}
               </button>
             </Link>
           ))}

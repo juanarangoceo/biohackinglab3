@@ -1,65 +1,6 @@
-import { 
-  Brain, 
-  Pill, 
-  Sun, 
-  Moon, 
-  Dumbbell, 
-  Thermometer,
-  Heart,
-  Eye
-} from "lucide-react"
+import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
-
-const topics = [
-  {
-    icon: Brain,
-    title: "Nootrópicos",
-    description: "Suplementos y compuestos que potencian tu memoria, concentración y claridad mental.",
-    tag: "Cognitivo"
-  },
-  {
-    icon: Sun,
-    title: "Terapia de Luz",
-    description: "Optimiza tus ritmos circadianos con luz roja, infrarroja y exposición solar estratégica.",
-    tag: "Energía"
-  },
-  {
-    icon: Moon,
-    title: "Optimización del Sueño",
-    description: "Hackea tu descanso para regenerarte mejor y despertar con máxima energía cada día.",
-    tag: "Recuperación"
-  },
-  {
-    icon: Thermometer,
-    title: "Terapia de Frío",
-    description: "Duchas frías, crioterapia y exposición al frío para activar tu metabolismo y resiliencia.",
-    tag: "Hormesis"
-  },
-  {
-    icon: Dumbbell,
-    title: "Ejercicio Inteligente",
-    description: "Protocolos de entrenamiento diseñados para maximizar resultados con el mínimo tiempo.",
-    tag: "Rendimiento"
-  },
-  {
-    icon: Pill,
-    title: "Suplementación",
-    description: "Vitaminas, minerales y compuestos esenciales para llenar los vacíos de tu nutrición.",
-    tag: "Nutrición"
-  },
-  {
-    icon: Heart,
-    title: "Variabilidad Cardíaca",
-    description: "Monitorea y mejora tu HRV para entender tu estado de recuperación y estrés.",
-    tag: "Tracking"
-  },
-  {
-    icon: Eye,
-    title: "Ayuno Intermitente",
-    description: "Estrategias de alimentación temporal para autofagia, longevidad y claridad mental.",
-    tag: "Longevidad"
-  }
-]
+import { topics } from "@/config/topics"
 
 export function TopicsSection() {
   return (
@@ -82,30 +23,32 @@ export function TopicsSection() {
         {/* Topics Grid */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {topics.map((topic) => (
-            <Card 
-              key={topic.title}
-              className="group relative overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:bg-card"
-            >
-              <CardContent className="p-6">
-                {/* Tag */}
-                <span className="mb-4 inline-block rounded-full bg-primary/10 px-3 py-1 font-mono text-xs font-medium text-primary">
-                  {topic.tag}
-                </span>
-                
-                {/* Icon */}
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-secondary transition-colors group-hover:bg-primary/20">
-                  <topic.icon className="h-6 w-6 text-primary" />
-                </div>
-                
-                {/* Content */}
-                <h3 className="mb-2 font-mono text-lg font-semibold text-foreground">
-                  {topic.title}
-                </h3>
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {topic.description}
-                </p>
-              </CardContent>
-            </Card>
+            <Link key={topic.slug} href={`/temas/${topic.slug}`} className="block h-full">
+              <Card 
+                className="group relative h-full overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:bg-card hover:shadow-lg hover:shadow-primary/5"
+              >
+                <CardContent className="p-6 flex flex-col h-full">
+                  {/* Tag */}
+                  {/* Using title as tag for now, or we could add a short tag to the config if needed */}
+                  <span className="mb-4 inline-block rounded-full bg-primary/10 px-3 py-1 font-mono text-xs font-medium text-primary w-fit">
+                    {topic.title}
+                  </span>
+                  
+                  {/* Icon */}
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-secondary transition-colors group-hover:bg-primary/20">
+                    <topic.icon className="h-6 w-6 text-primary" />
+                  </div>
+                  
+                  {/* Content */}
+                  <h3 className="mb-2 font-mono text-lg font-semibold text-foreground">
+                    {topic.title}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground flex-grow">
+                    {topic.description}
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       </div>

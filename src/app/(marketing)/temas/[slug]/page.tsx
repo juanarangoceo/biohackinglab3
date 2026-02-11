@@ -16,14 +16,15 @@ import {
 import { Badge } from "@/components/ui/badge"
 
 interface PageProps {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 // 1. Generate Metadata
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const topic = topics.find((t) => t.slug === params.slug)
+  const { slug } = await params
+  const topic = topics.find((t) => t.slug === slug)
   
   if (!topic) {
     return {
@@ -43,7 +44,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 // 2. Main Page Component
-export default async function CategoryPage({ params }: PageProps) {
+export default async function CategoryPage(props: PageProps) {
+  const params = await props.params
   const topic = topics.find((t) => t.slug === params.slug)
 
   if (!topic) {
