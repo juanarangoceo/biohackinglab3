@@ -1,12 +1,17 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
+import Link from "next/link"
+import { format } from "date-fns"
+import { es } from "date-fns/locale"
 import { topics } from "@/config/topics"
 import { sanityFetch } from "@/lib/sanity/client"
 import { postsByCategoryQuery } from "@/lib/sanity/queries"
 import { NewsletterSection } from "@/components/sections/newsletter-section"
 import { MedicalDisclaimer } from "@/components/blog/MedicalDisclaimer"
-import { BlogGrid } from "@/components/features/BlogGrid"
-import { CheckCircle2 } from "lucide-react"
+import { Header } from "@/components/sections/header"
+import { Footer } from "@/components/sections/footer"
+import { Card, CardContent } from "@/components/ui/card"
+import { CheckCircle2, Clock, ArrowRight } from "lucide-react"
 import {
   Accordion,
   AccordionContent,
@@ -19,6 +24,13 @@ interface PageProps {
   params: Promise<{
     slug: string
   }>
+}
+
+function calculateReadTime(excerpt: string | null): string {
+  const avgWords = 1200
+  const wpm = 200
+  const minutes = Math.ceil(avgWords / wpm)
+  return `${minutes} min`
 }
 
 // 1. Generate Metadata
@@ -53,14 +65,14 @@ export default async function CategoryPage(props: PageProps) {
   }
 
   // Fetch related posts from Sanity
-  // We use the slug as the category key. In Sanity schema we used 'terapia-de-luz' etc.
-  // which matches our topic.slug exactly.
   const posts = await sanityFetch(postsByCategoryQuery, { category: topic.slug })
 
   return (
-    <main className="min-h-screen bg-background pt-24">
+    <main className="min-h-screen bg-background">
+      <Header />
+      
       {/* --- HERO SECTION --- */}
-      <section className="relative overflow-hidden pb-16 pt-12 md:pb-24 md:pt-20">
+      <section className="relative overflow-hidden pb-16 pt-32 md:pb-24 md:pt-40">
         <div className="absolute inset-0 bg-secondary/20" />
         <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl opacity-50" />
         
@@ -142,12 +154,44 @@ export default async function CategoryPage(props: PageProps) {
                 </h2>
             </div>
             
-            <BlogGrid 
-                posts={posts} 
-                currentPage={1} 
-                totalPages={1} 
-                activeCategory={topic.slug} 
-            />
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
+              {posts.map((article: any) => (
+                <Link key={article.slug} href={`/blog/${article.slug}`}>
+                  <Card className="group h-full overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:bg-card">
+                    <CardContent className="flex h-full flex-col p-6">
+                      <div className="mb-4 flex items-center gap-2">
+                        <Badge variant="secondary" className="font-mono text-xs capitalize">
+                          {article.category}
+                        </Badge>
+                      </div>
+                      
+                      <h3 className="mb-3 font-mono text-lg font-semibold text-foreground transition-colors group-hover:text-primary text-balance">
+                        {article.title}
+                      </h3>
+                      
+                      <p className="mb-4 flex-grow text-sm text-muted-foreground leading-relaxed">
+                        {article.excerpt || 'Artículo de biohacking'}
+                      </p>
+                      
+                      <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-3 text-muted-foreground">
+                          <span>
+                            {article.publishedAt 
+                              ? format(new Date(article.publishedAt), "d MMM", { locale: es })
+                              : 'Pronto'}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {calculateReadTime(article.excerpt)}
+                          </span>
+                        </div>
+                        <ArrowRight className="h-4 w-4 text-primary opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-1" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
             
             <div className="mt-12 text-center">
                  <p className="text-muted-foreground">
@@ -184,6 +228,8 @@ export default async function CategoryPage(props: PageProps) {
 
       {/* --- NEWSLETTER CTA --- */}
       <NewsletterSection />
+      
+      <Footer />
     </main>
   )
 }
