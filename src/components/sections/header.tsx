@@ -2,14 +2,15 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Menu, X, Dna } from "lucide-react"
+import { Menu, X, Dna, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
-
-const navLinks = [
-  { href: "/", label: "Inicio" },
-  { href: "/apps", label: "Apps" },
-  { href: "/blog", label: "Blog" },
-]
+import { marketingNav } from "@/config/nav";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -36,14 +37,32 @@ export function Header() {
 
         {/* Desktop Navigation */}
         <div className="hidden items-center gap-8 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-            >
-              {link.label}
-            </Link>
+          {marketingNav.map((link) => (
+            link.children ? (
+              <DropdownMenu key={link.name}>
+                <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary transition-colors focus:outline-none">
+                  {link.name}
+                  <ChevronDown className="h-4 w-4" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  {link.children.map((child) => (
+                    <DropdownMenuItem key={child.name} asChild>
+                      <Link href={child.href} className="w-full cursor-pointer">
+                        {child.name}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link
+                key={link.name}
+                href={link.href}
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+              >
+                {link.name}
+              </Link>
+            )
           ))}
           <Button asChild>
             <Link href="#newsletter">Únete Gratis</Link>
@@ -68,16 +87,34 @@ export function Header() {
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="border-t border-border/50 bg-background/95 backdrop-blur-xl md:hidden">
-          <div className="flex flex-col gap-4 px-6 py-6">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-lg font-medium text-muted-foreground transition-colors hover:text-primary"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {link.label}
-              </Link>
+          <div className="flex flex-col gap-4 px-6 py-6 overflow-y-auto max-h-[85vh]">
+            {marketingNav.map((link) => (
+              link.children ? (
+                <div key={link.name} className="flex flex-col gap-2">
+                  <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wider px-1 mt-2">
+                    {link.name}
+                  </div>
+                  {link.children.map((child) => (
+                    <Link
+                      key={child.name}
+                      href={child.href}
+                      className="text-lg font-medium text-foreground hover:text-primary pl-4 border-l-2 border-border hover:border-primary transition-colors"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {child.name}
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="text-lg font-medium text-muted-foreground transition-colors hover:text-primary"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {link.name}
+                </Link>
+              )
             ))}
             <Button asChild className="mt-2">
               <Link href="#newsletter">Únete Gratis</Link>
