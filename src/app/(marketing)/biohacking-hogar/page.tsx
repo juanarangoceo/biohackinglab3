@@ -97,7 +97,7 @@ export default async function BiohackingHogarPage(props: PageProps) {
   const categoryTags = Array.from(uniqueTagsMap.values())
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background overflow-x-hidden">
       <Header />
       
       {/* --- HERO SECTION --- */}

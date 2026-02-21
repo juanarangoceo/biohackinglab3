@@ -109,7 +109,7 @@ export default async function TagPage({ params }: TagPageProps) {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-background">
+      <main className="min-h-screen bg-background overflow-x-hidden">
         
         {/* Tag Header & SGO Content */}
         <section className="pt-32 pb-12">
