@@ -22,7 +22,7 @@ const TAG_QUERY = `
 `
 
 const TAG_POSTS_QUERY = `
-  *[_type == "post" && references(*[_type=="tag" && slug.current == $slug]._id)] | order(publishedAt desc) {
+  *[_type == "post" && $slug in tags[]->slug.current] | order(publishedAt desc) {
     _id,
     title,
     "slug": slug.current,
@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: TagPageProps): Promise<Metada
   
   const [tag, postCount] = await Promise.all([
     sanityClient.fetch(TAG_QUERY, { slug }),
-    sanityClient.fetch(`count(*[_type == "post" && references(*[_type=="tag" && slug.current == $slug]._id)])`, { slug })
+    sanityClient.fetch(`count(*[_type == "post" && $slug in tags[]->slug.current])`, { slug })
   ])
 
   if (!tag) {
@@ -76,7 +76,7 @@ export default async function TagPage({ params }: TagPageProps) {
   }
 
   // Format posts for BlogGrid
-  const formattedPosts = postsData.map((p: any) => ({
+  const formattedPosts = (postsData || []).map((p: any) => ({
     id: p._id,
     slug: p.slug,
     title: p.title,

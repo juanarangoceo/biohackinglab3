@@ -3,8 +3,8 @@ import { Header } from "@/components/sections/header"
 import { Footer } from "@/components/sections/footer"
 import { NewsletterSection } from "@/components/sections/newsletter-section"
 import { MedicalDisclaimer } from "@/components/blog/MedicalDisclaimer"
-import { BlogGrid } from "@/components/features/BlogGrid"
-import { Dna, Flower2, HeartPulse, Activity } from "lucide-react"
+import { Dna, Flower2, HeartPulse, Activity, Tag } from "lucide-react"
+import Link from "next/link"
 import { db } from "@/db"
 import { posts } from "@/db/schema"
 import { desc, eq, and, isNotNull, sql } from "drizzle-orm"
@@ -81,6 +81,19 @@ export default async function LongevidadFemeninaPage(props: PageProps) {
       tags: tagsMap.get(post.slug) || []
     }))
   }
+
+  // Extract unique tags for this category
+  const uniqueTagsMap = new Map<string, {title: string, slug: string}>()
+  enhancedPosts.forEach((post: any) => {
+    if (post.tags && Array.isArray(post.tags)) {
+      post.tags.forEach((tag: any) => {
+        if (tag && tag.slug) {
+          uniqueTagsMap.set(tag.slug, tag)
+        }
+      })
+    }
+  })
+  const categoryTags = Array.from(uniqueTagsMap.values())
 
   return (
     <main className="min-h-screen bg-background">
@@ -213,22 +226,36 @@ export default async function LongevidadFemeninaPage(props: PageProps) {
         <div className="container mx-auto px-6">
           <div className="mb-12 text-center">
             <h2 className="font-mono text-3xl font-bold tracking-tight mb-4">
-              Investigaciones y Protocolos
+              Colecciones y Hubs Semánticos
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Explora nuestros artículos, guías paso a paso y resúmenes de los últimos papers científicos enfocados en extender tu Healthspan y preservar la función de tu eje hormonal joven.
+              Explora nuestros grupos de temas relacionados, guías paso a paso y hubs científicos enfocados en extender tu Healthspan y preservar la función de tu eje hormonal joven.
             </p>
           </div>
 
-          <BlogGrid 
-            posts={enhancedPosts} 
-            currentPage={currentPage}
-            totalPages={totalPages}
-            activeCategory={category}
-            baseRoute="/longevidad-femenina" // Customize the pagination route to stay on this specific landing
-            hideHeader={true}
-            hideFilters={true}
-          />
+          {categoryTags.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {categoryTags.map(tag => (
+                <Link key={tag.slug} href={`/tag/${tag.slug}`} className="block group h-full">
+                  <div className="rounded-2xl border border-border bg-card p-6 h-full flex flex-col transition-all hover:border-pink-500/50 hover:shadow-md">
+                    <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-pink-500/10 shrink-0">
+                      <Tag className="h-6 w-6 text-pink-500" />
+                    </div>
+                    <h3 className="mb-2 font-mono text-xl font-bold group-hover:text-pink-500 transition-colors">
+                      {tag.title}
+                    </h3>
+                    <p className="text-muted-foreground text-sm flex-grow">
+                      Explora todos los artículos y protocolos de nuestra base de datos relacionados con {tag.title.toLowerCase()}.
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 border border-dashed border-border rounded-xl bg-background/50">
+              <p className="text-muted-foreground">Aún no se han generado etiquetas o colecciones para esta categoría. Pronto añadiremos nuevo contenido guiado por la IA.</p>
+            </div>
+          )}
         </div>
       </section>
 

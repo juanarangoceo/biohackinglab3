@@ -8,6 +8,9 @@ import { db } from "@/db"
 import { posts } from "@/db/schema"
 import { desc, eq, and, isNotNull, sql } from "drizzle-orm"
 import { generateItemListSchema } from "@/lib/seo/schema"
+import { sanityClient } from "@/lib/sanity/client"
+import { Tag } from "lucide-react"
+import Link from "next/link"
 
 export const metadata: Metadata = {
   title: "Biohacking del Hogar: Optimiza tu Entorno | Biohacking Lab",
@@ -62,6 +65,36 @@ export default async function BiohackingHogarPage(props: PageProps) {
     .orderBy(desc(posts.publishedAt))
     .limit(POSTS_PER_PAGE)
     .offset((currentPage - 1) * POSTS_PER_PAGE)
+
+  // Fetch Sanity Tags
+  const slugs = blogPosts.map(p => p.slug)
+  let enhancedPosts = blogPosts
+  if (slugs.length > 0) {
+    const sanityTagsPosts = await sanityClient.fetch(
+      `*[_type == "post" && slug.current in $slugs]{ "slug": slug.current, "tags": tags[]->{title, "slug": slug.current} }`,
+      { slugs }
+    )
+    const tagsMap = new Map<string, {title: string, slug: string}[]>(
+      sanityTagsPosts.map((p: any) => [p.slug, p.tags || []])
+    )
+    enhancedPosts = blogPosts.map((post: any) => ({
+      ...post,
+      tags: tagsMap.get(post.slug) || []
+    }))
+  }
+
+  // Extract unique tags for this category
+  const uniqueTagsMap = new Map<string, {title: string, slug: string}>()
+  enhancedPosts.forEach((post: any) => {
+    if (post.tags && Array.isArray(post.tags)) {
+      post.tags.forEach((tag: any) => {
+        if (tag && tag.slug) {
+          uniqueTagsMap.set(tag.slug, tag)
+        }
+      })
+    }
+  })
+  const categoryTags = Array.from(uniqueTagsMap.values())
 
   return (
     <main className="min-h-screen bg-background">
@@ -192,20 +225,36 @@ export default async function BiohackingHogarPage(props: PageProps) {
         <div className="container mx-auto px-6">
           <div className="mb-12 text-center">
             <h2 className="font-mono text-3xl font-bold tracking-tight mb-4">
-              Equipamiento, Reseñas y Ambientación
+              Colecciones y Hubs Semánticos
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Lee las reseñas del mejor equipo para modificar tu entorno, guías sobre reducción de moho, trucos simples para apartamentos y protocolos de Smart Home.
+              Explora nuestros grupos de temas relacionados, guías inteligentes y hubs científicos enfocados en optimizar la salud de tu entorno.
             </p>
           </div>
 
-          <BlogGrid 
-            posts={blogPosts} 
-            currentPage={currentPage}
-            totalPages={totalPages}
-            activeCategory={category}
-            baseRoute="/biohacking-hogar"
-          />
+          {categoryTags.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {categoryTags.map(tag => (
+                <Link key={tag.slug} href={`/tag/${tag.slug}`} className="block group h-full">
+                  <div className="rounded-2xl border border-border bg-card p-6 h-full flex flex-col transition-all hover:border-blue-500/50 hover:shadow-md">
+                    <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/10 shrink-0">
+                      <Tag className="h-6 w-6 text-blue-500" />
+                    </div>
+                    <h3 className="mb-2 font-mono text-xl font-bold group-hover:text-blue-500 transition-colors">
+                      {tag.title}
+                    </h3>
+                    <p className="text-muted-foreground text-sm flex-grow">
+                      Explora todos los artículos y protocolos de nuestra base de datos relacionados con {tag.title.toLowerCase()}.
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 border border-dashed border-border rounded-xl bg-background/50">
+              <p className="text-muted-foreground">Aún no se han generado etiquetas o colecciones para esta categoría. Pronto añadiremos nuevo contenido guiado por la IA.</p>
+            </div>
+          )}
         </div>
       </section>
 
