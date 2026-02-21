@@ -21,6 +21,7 @@ export const marketingNav = [
       { name: "Ayuno", href: "/temas/ayuno" },
     ]
   },
+  { name: "Longevidad Femenina", href: "/longevidad-femenina" },
   { name: "Blog", href: "/blog" },
   { name: "Apps", href: "/apps" },
 ]

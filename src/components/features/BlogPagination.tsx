@@ -6,16 +6,17 @@ interface BlogPaginationProps {
   currentPage: number
   totalPages: number
   category?: string
+  baseRoute?: string
 }
 
-export function BlogPagination({ currentPage, totalPages, category }: BlogPaginationProps) {
+export function BlogPagination({ currentPage, totalPages, category, baseRoute = '/blog' }: BlogPaginationProps) {
   const buildUrl = (page: number) => {
     const params = new URLSearchParams()
     params.set('page', page.toString())
-    if (category && category !== 'all') {
+    if (category && category !== 'all' && baseRoute === '/blog') {
       params.set('category', category)
     }
-    return `/blog?${params.toString()}`
+    return `${baseRoute}?${params.toString()}`
   }
 
   if (totalPages <= 1) {

@@ -263,6 +263,7 @@ function normalizeCategory(category?: string): string {
   
   const normalized = category.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
   
+  if (normalized.includes('mujer') || normalized.includes('femenin') || normalized.includes('ovari') || normalized.includes('menopausia') || normalized.includes('hormonas-femeninas')) return 'longevidad-femenina';
   if (normalized.includes('nootropico')) return 'nootropicos';
   if (normalized.includes('sueno') || normalized.includes('sleep')) return 'sueno';
   if (normalized.includes('nutricion')) return 'nutricion';

@@ -29,6 +29,7 @@ interface BlogGridProps {
   currentPage: number
   totalPages: number
   activeCategory: string
+  baseRoute?: string
 }
 
 function calculateReadTime(excerpt: string | null): string {
@@ -39,7 +40,7 @@ function calculateReadTime(excerpt: string | null): string {
   return `${minutes} min`
 }
 
-export function BlogGrid({ posts, currentPage, totalPages, activeCategory }: BlogGridProps) {
+export function BlogGrid({ posts, currentPage, totalPages, activeCategory, baseRoute }: BlogGridProps) {
   // Separate featured posts (first 2 if on page 1)
   const featuredPosts = currentPage === 1 ? posts.slice(0, 2) : []
   const regularPosts = currentPage === 1 ? posts.slice(2) : posts
@@ -191,6 +192,7 @@ export function BlogGrid({ posts, currentPage, totalPages, activeCategory }: Blo
           currentPage={currentPage}
           totalPages={totalPages}
           category={activeCategory}
+          baseRoute={baseRoute}
         />
       </div>
     </section>
