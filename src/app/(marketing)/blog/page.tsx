@@ -85,7 +85,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   }))
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background overflow-x-hidden">
       <Header />
       
       {/* Featured Hubs Navigation */}

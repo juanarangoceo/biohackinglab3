@@ -116,7 +116,7 @@ export function BlogGrid({ posts, currentPage, totalPages, activeCategory, baseR
               <Link key={article.slug} href={`/blog/${article.slug}`}>
                 <Card className="group h-full overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:bg-card">
                   <CardContent className="flex h-full flex-col p-8">
-                    <div className="mb-4 flex items-center gap-3">
+                    <div className="mb-4 flex flex-wrap items-center gap-2">
                       <Badge className="bg-primary/20 text-primary hover:bg-primary/30">
                         <TrendingUp className="mr-1 h-3 w-3" />
                         Destacado
@@ -133,7 +133,7 @@ export function BlogGrid({ posts, currentPage, totalPages, activeCategory, baseR
                       ))}
                     </div>
                     
-                    <h2 className="mb-3 font-mono text-2xl font-bold text-foreground transition-colors group-hover:text-primary text-balance">
+                    <h2 className="mb-3 font-mono text-2xl font-bold text-foreground transition-colors group-hover:text-primary text-balance break-words">
                       {article.title}
                     </h2>
                     
@@ -169,7 +169,7 @@ export function BlogGrid({ posts, currentPage, totalPages, activeCategory, baseR
             <Link key={article.slug} href={`/blog/${article.slug}`}>
               <Card className="group h-full overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:bg-card">
                 <CardContent className="flex h-full flex-col p-6">
-                  <div className="mb-4 flex items-center gap-2">
+                  <div className="mb-4 flex flex-wrap items-center gap-2">
                     <Badge variant="secondary" className="font-mono text-xs capitalize">
                       {article.category}
                     </Badge>
@@ -182,7 +182,7 @@ export function BlogGrid({ posts, currentPage, totalPages, activeCategory, baseR
                     ))}
                   </div>
                   
-                  <h3 className="mb-3 font-mono text-lg font-semibold text-foreground transition-colors group-hover:text-primary text-balance">
+                  <h3 className="mb-3 font-mono text-lg font-semibold text-foreground transition-colors group-hover:text-primary text-balance break-words">
                     {article.title}
                   </h3>
                   

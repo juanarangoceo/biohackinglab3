@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function AppsPage() {
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background overflow-x-hidden">
       <Header />
       <AppsGrid />
       <Footer />

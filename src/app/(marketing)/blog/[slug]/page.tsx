@@ -123,7 +123,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const faqData = post.faq as Array<{ question: string; answer: string }> | null
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background overflow-x-hidden">
       <Header />
       
       <div className="container mx-auto px-4 pt-24 pb-12 max-w-7xl">

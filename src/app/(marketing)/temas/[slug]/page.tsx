@@ -68,7 +68,7 @@ export default async function CategoryPage(props: PageProps) {
   const posts = await sanityFetch(postsByCategoryQuery, { category: topic.slug })
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background overflow-x-hidden">
       <Header />
       
       {/* --- HERO SECTION --- */}
