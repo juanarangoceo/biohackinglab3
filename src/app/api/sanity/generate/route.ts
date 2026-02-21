@@ -45,6 +45,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ 
       success: true, 
       data: result.data,
+      generatedContent: result.generatedContent,
     })
   } catch (error) {
     console.error('API Error:', error)

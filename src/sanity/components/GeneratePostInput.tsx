@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from 'react'
 import { TextArea, Button, Stack, Card, Text, Spinner } from '@sanity/ui'
-import { set, unset, useClient } from 'sanity'
+import { set, unset, useClient, useFormValue } from 'sanity'
 import { StringInputProps } from 'sanity'
 
 export function GeneratePostInput(props: StringInputProps) {
@@ -15,6 +15,7 @@ export function GeneratePostInput(props: StringInputProps) {
   
   // Use Studio's authenticated client
   const client = useClient({ apiVersion: '2024-01-01' })
+  const documentId = useFormValue(['_id']) as string | undefined
 
   const handleGenerate = useCallback(async () => {
     if (!topic || topic.trim() === '') {
@@ -22,7 +23,7 @@ export function GeneratePostInput(props: StringInputProps) {
       return
     }
 
-    if (!confirm(`¿Generar y publicar automáticamente un blog sobre: "${topic}"?`)) {
+    if (!confirm(`¿Generar un blog sobre: "${topic}"? (Se guardará como borrador para tu revisión)`)) {
       return
     }
 
@@ -37,6 +38,7 @@ export function GeneratePostInput(props: StringInputProps) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          documentId,
           topic,
           additionalPrompt: additionalPrompt || undefined,
         }),
@@ -44,42 +46,14 @@ export function GeneratePostInput(props: StringInputProps) {
 
       const result = await response.json()
 
-      if (result.success && result.generatedContent) {
-        // Create the document using Studio's authenticated client
-        const doc = await client.create({
-          _type: 'post',
-          ...result.generatedContent,
-        })
-
-        // CRITICAL: Sync to Supabase so it appears on the blog page
-        const syncResponse = await fetch('/api/sanity/sync', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            _id: doc._id,
-            title: doc.title,
-            slug: doc.slug,
-            excerpt: doc.excerpt,
-            content: doc.content,
-            category: doc.category,
-            faq: doc.faq,
-            aiGenerated: doc.aiGenerated,
-            publishedAt: doc.publishedAt,
-          }),
-        })
-
-        if (!syncResponse.ok) {
-          const errorData = await syncResponse.text() // Get text response in case it's not JSON
-          throw new Error(`Error de sincronización (Supabase): ${syncResponse.status} ${syncResponse.statusText} - ${errorData.substring(0, 100)}`)
-        }
-
+      if (result.success) {
         setSuccess(true)
         setError(null)
         setTopic('')
         setAdditionalPrompt('')
         onChange(unset())
         
-        // Reload to show the new post
+        // Reload to show the new content patched by the server
         setTimeout(() => {
           window.location.reload()
         }, 1500)
@@ -111,7 +85,7 @@ export function GeneratePostInput(props: StringInputProps) {
             🤖 Generador de Blog con IA
           </Text>
           <Text size={1} muted>
-            Ingresa un tema y la IA generará automáticamente el título, slug, contenido, excerpt y categoría. El post se publicará automáticamente.
+            Ingresa un tema y la IA generará el contenido en este mismo borrador. Revisa y formatea antes de publicar.
           </Text>
         </Stack>
       </Card>
@@ -138,7 +112,7 @@ export function GeneratePostInput(props: StringInputProps) {
         />
 
         <Button
-          text={isGenerating ? 'Generando...' : 'Generar y Publicar Blog'}
+          text={isGenerating ? 'Generando...' : 'Generar Borrador'}
           tone="primary"
           onClick={handleGenerate}
           disabled={isGenerating || !topic.trim()}
@@ -155,7 +129,7 @@ export function GeneratePostInput(props: StringInputProps) {
 
         {success && (
           <Card padding={3} radius={2} tone="positive">
-            <Text size={1}>✅ Blog generado y publicado exitosamente! Recargando...</Text>
+            <Text size={1}>✅ Contenido generado existosamente en el borrador! Recargando...</Text>
           </Card>
         )}
       </Stack>
