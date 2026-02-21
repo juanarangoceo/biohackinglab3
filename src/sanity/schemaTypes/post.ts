@@ -129,6 +129,7 @@ export default defineType({
           { title: 'Suplementación', value: 'suplementacion' },
           { title: 'Variabilidad Cardíaca', value: 'hrv' },
           { title: 'Ayuno Intermitente', value: 'ayuno' },
+          { title: 'Longevidad Femenina', value: 'longevidad-femenina' },
         ],
       },
       description: 'Se genera automáticamente. Puedes editarlo después.',

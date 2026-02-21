@@ -16,6 +16,11 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: "Biohacking Lab 3.0",
   description: "Optimización Humana a través de Ciencia y Tecnología",
+  icons: {
+    icon: "https://res.cloudinary.com/dohwyszdj/image/upload/v1771708225/1770043345025_lu7nro.png",
+    shortcut: "https://res.cloudinary.com/dohwyszdj/image/upload/v1771708225/1770043345025_lu7nro.png",
+    apple: "https://res.cloudinary.com/dohwyszdj/image/upload/v1771708225/1770043345025_lu7nro.png",
+  }
 };
 
 import Navbar from "@/components/layout/Navbar";
@@ -44,7 +49,7 @@ export default function RootLayout({
               "url": "https://biohackinglab3.com",
               "logo": {
                 "@type": "ImageObject",
-                "url": "https://biohackinglab3.com/logo.png"
+                "url": "https://res.cloudinary.com/dohwyszdj/image/upload/v1771708225/1770043345025_lu7nro.png"
               },
               "description": "Plataforma líder en biohacking, longevidad y optimización del rendimiento humano",
               "sameAs": [

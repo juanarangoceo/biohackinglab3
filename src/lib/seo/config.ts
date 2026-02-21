@@ -4,7 +4,7 @@ export const seoConfig = {
   defaultTitle: "BioHacking Lab 3.0 | Optimización Humana y Longevidad",
   defaultDescription: "Plataforma líder en biohacking, longevidad y optimización del rendimiento humano. Descubre protocolos científicos, nootrópicos y estrategias para mejorar tu salud.",
   twitterHandle: "@biohackinglab",
-  defaultOgImage: "/og-default.png",
+  defaultOgImage: "https://res.cloudinary.com/dohwyszdj/image/upload/v1771708225/1770043345025_lu7nro.png",
   locale: "es_ES",
   author: {
     name: "Juan Arango",
@@ -12,7 +12,7 @@ export const seoConfig = {
   },
   organization: {
     name: "BioHacking Lab 3.0",
-    logo: "https://biohackinglab3.com/logo.png",
+    logo: "https://res.cloudinary.com/dohwyszdj/image/upload/v1771708225/1770043345025_lu7nro.png",
     sameAs: [
       "https://twitter.com/biohackinglab",
       "https://instagram.com/biohackinglab",
