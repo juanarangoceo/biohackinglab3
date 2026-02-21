@@ -36,6 +36,7 @@ export async function POST(req: Request) {
         category: result.generatedContent.category,
         faq: result.generatedContent.faq,
         references: result.generatedContent.references,
+        tags: result.generatedContent.tags,
         aiGenerated: true,
         author: result.generatedContent.author,
         authorRole: result.generatedContent.authorRole,
