@@ -27,6 +27,7 @@ export async function POST(req: Request) {
       category,
       faq,
       references,
+      "coverImage": mainImage.asset->url,
       aiGenerated,
       publishedAt
     }`, { id: _id })
@@ -46,6 +47,7 @@ export async function POST(req: Request) {
       category, 
       faq, 
       references, 
+      coverImage,
       aiGenerated, 
       publishedAt 
     } = post
@@ -68,6 +70,7 @@ export async function POST(req: Request) {
       category: category || 'general',
       faq: faq || null,
       references: references || null,
+      coverImage: coverImage || null,
       sanityId: _id,
       aiGenerated: aiGenerated || false,
       publishedAt: publishedAt ? new Date(publishedAt) : new Date(),
@@ -80,6 +83,7 @@ export async function POST(req: Request) {
         category: category || 'general',
         faq: faq || null,
         references: references || null,
+        coverImage: coverImage || null,
         slug: postSlug,
         updatedAt: new Date(),
       }
@@ -95,6 +99,35 @@ export async function POST(req: Request) {
     console.error('Sync error:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to sync to Supabase' },
+      { status: 500 }
+    )
+  }
+}
+
+import { eq } from 'drizzle-orm'
+
+export async function DELETE(req: Request) {
+  try {
+    const body = await req.json()
+    const { _id } = body
+
+    if (!_id) {
+      return NextResponse.json(
+        { success: false, error: 'Missing required field: _id' },
+        { status: 400 }
+      )
+    }
+
+    await db.delete(posts).where(eq(posts.sanityId, _id))
+
+    revalidatePath('/sitemap.xml')
+    revalidatePath('/blog')
+
+    return NextResponse.json({ success: true, message: 'Deleted successfully' })
+  } catch (error) {
+    console.error('Sync delete error:', error)
+    return NextResponse.json(
+      { success: false, error: 'Failed to delete from Supabase' },
       { status: 500 }
     )
   }

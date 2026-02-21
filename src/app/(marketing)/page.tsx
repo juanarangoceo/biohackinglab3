@@ -3,6 +3,7 @@ import { HeroSection } from "@/components/sections/hero-section"
 import { TopicsSection } from "@/components/sections/topics-section"
 import { MethodsSection } from "@/components/sections/methods-section"
 import { BenefitsSection } from "@/components/sections/benefits-section"
+import { SuggestedBlogsSection } from "@/components/sections/suggested-blogs-section"
 import { TestimonialsSection } from "@/components/sections/testimonials-section"
 import { FAQSection } from "@/components/sections/faq-section"
 import { NewsletterSection } from "@/components/sections/newsletter-section"
@@ -17,6 +18,7 @@ export default function HomePage() {
       <TopicsSection />
       <MethodsSection />
       <BenefitsSection />
+      <SuggestedBlogsSection />
       <TestimonialsSection />
       <FAQSection />
       <NewsletterSection />

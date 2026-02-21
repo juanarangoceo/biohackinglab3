@@ -257,6 +257,20 @@ function generateSlug(title: string): string {
     .replace(/-+/g, '-') // Remove consecutive hyphens
 }
 
+// Helper to normalize category from AI output
+function normalizeCategory(category?: string): string {
+  if (!category) return 'longevidad';
+  
+  const normalized = category.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  
+  if (normalized.includes('nootropico')) return 'nootropicos';
+  if (normalized.includes('sueno') || normalized.includes('sleep')) return 'sueno';
+  if (normalized.includes('nutricion')) return 'nutricion';
+  if (normalized.includes('fitness') || normalized.includes('ejercicio')) return 'fitness';
+  
+  return 'longevidad'; // Default fallback
+}
+
 /**
  * Generate a complete blog post from a topic
  * This creates a new Sanity document with all fields populated
@@ -314,7 +328,7 @@ export async function generateBlogFromTopic(
         },
         content: portableTextContent,
         excerpt,
-        category: category?.toLowerCase() || 'longevidad',
+        category: normalizeCategory(category),
         faq: Array.isArray(faq) ? faq.map((item: any) => ({ ...item, _key: generateKey() })) : [],
         references: Array.isArray(references) ? references.map((item: any) => ({ ...item, _key: generateKey() })) : [],
         aiGenerated: true,

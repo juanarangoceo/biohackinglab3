@@ -1,7 +1,6 @@
-// SEO Configuration
 export const seoConfig = {
   siteName: "BioHacking Lab 3.0",
-  siteUrl: "https://biohackinglab3.com",
+  siteUrl: "https://www.biohackinglab3.com",
   defaultTitle: "BioHacking Lab 3.0 | Optimización Humana y Longevidad",
   defaultDescription: "Plataforma líder en biohacking, longevidad y optimización del rendimiento humano. Descubre protocolos científicos, nootrópicos y estrategias para mejorar tu salud.",
   twitterHandle: "@biohackinglab",
