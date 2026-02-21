@@ -39,7 +39,7 @@ export function Header() {
         <div className="hidden items-center gap-8 md:flex">
           {marketingNav.map((link) => (
             link.children ? (
-              <DropdownMenu key={link.name}>
+              <DropdownMenu key={link.name} modal={false}>
                 <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary transition-colors focus:outline-none">
                   {link.name}
                   <ChevronDown className="h-4 w-4" />

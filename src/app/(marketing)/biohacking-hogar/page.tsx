@@ -112,7 +112,7 @@ export default async function BiohackingHogarPage(props: PageProps) {
               <Home className="h-8 w-8 text-blue-500" />
             </div>
             
-            <h1 className="mb-6 font-mono text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl text-balance">
+            <h1 className="mb-6 font-mono text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl text-balance break-words">
               Biohacking del <span className="text-blue-500 dark:text-blue-400">Hogar (Smart Home)</span>
             </h1>
             
@@ -232,29 +232,15 @@ export default async function BiohackingHogarPage(props: PageProps) {
             </p>
           </div>
 
-          {categoryTags.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {categoryTags.map(tag => (
-                <Link key={tag.slug} href={`/tag/${tag.slug}`} className="block group h-full">
-                  <div className="rounded-2xl border border-border bg-card p-6 h-full flex flex-col transition-all hover:border-blue-500/50 hover:shadow-md">
-                    <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/10 shrink-0">
-                      <Tag className="h-6 w-6 text-blue-500" />
-                    </div>
-                    <h3 className="mb-2 font-mono text-xl font-bold group-hover:text-blue-500 transition-colors">
-                      {tag.title}
-                    </h3>
-                    <p className="text-muted-foreground text-sm flex-grow">
-                      Explora todos los artículos y protocolos de nuestra base de datos relacionados con {tag.title.toLowerCase()}.
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 border border-dashed border-border rounded-xl bg-background/50">
-              <p className="text-muted-foreground">Aún no se han generado etiquetas o colecciones para esta categoría. Pronto añadiremos nuevo contenido guiado por la IA.</p>
-            </div>
-          )}
+          <BlogGrid 
+            posts={enhancedPosts} 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            activeCategory={category}
+            baseRoute={`/${category}`} 
+            hideHeader={true}
+            hideFilters={true}
+          />
         </div>
       </section>
 

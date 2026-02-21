@@ -114,7 +114,7 @@ export default async function TagPage({ params }: TagPageProps) {
         {/* Tag Header & SGO Content */}
         <section className="pt-32 pb-12">
           <div className="mx-auto max-w-4xl px-6">
-            <h1 className="mb-8 font-mono text-4xl font-bold tracking-tight text-foreground md:text-5xl">
+            <h1 className="mb-8 font-mono text-4xl font-bold tracking-tight text-foreground md:text-5xl break-words">
               Etiqueta: {tag.title}
             </h1>
             
@@ -136,11 +136,6 @@ export default async function TagPage({ params }: TagPageProps) {
             <h2 className="mb-2 text-2xl font-bold font-mono">Artículos sobre {tag.title}</h2>
             <p className="text-muted-foreground mb-8">
               {formattedPosts.length} post{formattedPosts.length !== 1 ? 's' : ''} enlazados a este concepto semántico.
-              {formattedPosts.length < 3 && (
-                <span className="text-yellow-600/80 text-sm ml-2">
-                  (Oculto a Google hasta tener 3 artículos)
-                </span>
-              )}
             </p>
             {formattedPosts.length > 0 ? (
               <BlogGrid 

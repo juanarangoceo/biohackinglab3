@@ -24,7 +24,7 @@ export function BlogPagination({ currentPage, totalPages, category, baseRoute = 
   }
 
   return (
-    <div className="mt-12 flex items-center justify-center gap-2">
+    <div className="mt-12 flex flex-wrap items-center justify-center gap-2">
       {/* Previous Button */}
       {currentPage > 1 ? (
         <Link href={buildUrl(currentPage - 1)}>
@@ -41,7 +41,7 @@ export function BlogPagination({ currentPage, totalPages, category, baseRoute = 
       )}
 
       {/* Page Numbers */}
-      <div className="flex items-center gap-1">
+      <div className="flex flex-wrap items-center justify-center gap-1">
         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
           // Show first page, last page, current page, and pages around current
           const showPage =
