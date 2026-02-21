@@ -1,6 +1,4 @@
 import Link from "next/link"
-import { format } from "date-fns"
-import { es } from "date-fns/locale"
 import { 
   Clock, 
   ArrowRight,
@@ -41,6 +39,21 @@ function calculateReadTime(excerpt: string | null): string {
   const wpm = 200
   const minutes = Math.ceil(avgWords / wpm)
   return `${minutes} min`
+}
+
+function formatDateSafe(dateVal: any, formatType: 'full' | 'short' = 'full'): string {
+  if (!dateVal) return 'Próximamente';
+  try {
+    const d = new Date(dateVal);
+    if (isNaN(d.getTime())) return 'Próximamente';
+    
+    if (formatType === 'short') {
+      return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+    }
+    return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  } catch (e) {
+    return 'Próximamente';
+  }
 }
 
 export function BlogGrid({ posts, currentPage, totalPages, activeCategory, baseRoute, hideHeader, hideFilters }: BlogGridProps) {
@@ -112,7 +125,7 @@ export function BlogGrid({ posts, currentPage, totalPages, activeCategory, baseR
                         {article.category}
                       </Badge>
                       {article.tags && article.tags.slice(0, 2).map(tag => (
-                        <Link key={tag.slug} href={`/tag/${tag.slug}`} onClick={(e) => e.stopPropagation()} className="z-10 relative">
+                        <Link key={tag.slug} href={`/tag/${tag.slug}`} className="z-10 relative">
                           <Badge variant="outline" className="font-mono text-[10px] hover:bg-secondary cursor-pointer border-primary/20 text-primary/80">
                             #{tag.title}
                           </Badge>
@@ -131,9 +144,7 @@ export function BlogGrid({ posts, currentPage, totalPages, activeCategory, baseR
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4 text-sm text-muted-foreground">
                         <span>
-                          {article.publishedAt 
-                            ? format(article.publishedAt, "d MMM yyyy", { locale: es })
-                            : 'Próximamente'}
+                          {formatDateSafe(article.publishedAt, 'full')}
                         </span>
                         <span className="flex items-center gap-1">
                           <Clock className="h-4 w-4" />
@@ -163,7 +174,7 @@ export function BlogGrid({ posts, currentPage, totalPages, activeCategory, baseR
                       {article.category}
                     </Badge>
                     {article.tags && article.tags.slice(0, 2).map(tag => (
-                      <Link key={tag.slug} href={`/tag/${tag.slug}`} onClick={(e) => e.stopPropagation()} className="z-10 relative">
+                      <Link key={tag.slug} href={`/tag/${tag.slug}`} className="z-10 relative">
                         <Badge variant="outline" className="font-mono text-[10px] hover:bg-secondary cursor-pointer border-primary/20 text-primary/80">
                           #{tag.title}
                         </Badge>
@@ -182,9 +193,7 @@ export function BlogGrid({ posts, currentPage, totalPages, activeCategory, baseR
                   <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-3 text-muted-foreground">
                       <span>
-                        {article.publishedAt 
-                          ? format(article.publishedAt, "d MMM", { locale: es })
-                          : 'Pronto'}
+                        {formatDateSafe(article.publishedAt, 'short')}
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />

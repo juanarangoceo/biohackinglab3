@@ -65,28 +65,46 @@ export async function generateMetadata({ params }: TagPageProps): Promise<Metada
 
 export default async function TagPage({ params }: TagPageProps) {
   const { slug } = await params
+  
+  console.log(`[TagPage] Loading tag page for slug: ${slug}`);
 
-  const [tag, postsData] = await Promise.all([
-    sanityClient.fetch(TAG_QUERY, { slug }),
-    sanityClient.fetch(TAG_POSTS_QUERY, { slug })
-  ])
+  try {
+    const [tag, postsData] = await Promise.all([
+      sanityClient.fetch(TAG_QUERY, { slug }),
+      sanityClient.fetch(TAG_POSTS_QUERY, { slug })
+    ])
+
+    console.log(`[TagPage] Data fetched. Tag found: ${!!tag}, Posts found: ${postsData?.length || 0}`);
 
   if (!tag) {
     notFound()
   }
 
   // Format posts for BlogGrid
-  const formattedPosts = (postsData || []).map((p: any) => ({
-    id: p._id,
-    slug: p.slug,
-    title: p.title,
-    excerpt: p.excerpt,
-    category: p.category,
-    publishedAt: p.publishedAt ? new Date(p.publishedAt) : null,
-    coverImage: p.mainImage || null,
-    aiGenerated: !!p.aiGenerated,
-    tags: p.tags || []
-  }))
+  const formattedPosts = (postsData || []).map((p: any) => {
+    let finalDate = null;
+    if (p.publishedAt) {
+      try {
+        finalDate = new Date(p.publishedAt);
+        // Date.parse check for NaN
+        if (isNaN(finalDate.getTime())) finalDate = null;
+      } catch (e) {
+        finalDate = null;
+      }
+    }
+    
+    return {
+      id: p._id,
+      slug: p.slug,
+      title: p.title || 'Sin Título',
+      excerpt: p.excerpt || '',
+      category: p.category || 'general',
+      publishedAt: finalDate,
+      coverImage: p.mainImage || null,
+      aiGenerated: !!p.aiGenerated,
+      tags: p.tags || []
+    }
+  })
 
   return (
     <>
@@ -124,15 +142,23 @@ export default async function TagPage({ params }: TagPageProps) {
                 </span>
               )}
             </p>
-            <BlogGrid 
-              posts={formattedPosts}
-              currentPage={1}
-              totalPages={1}
-              activeCategory="all"
-              baseRoute={`/tag/${slug}`}
-              hideHeader={true}
-              hideFilters={true}
-            />
+            {formattedPosts.length > 0 ? (
+              <BlogGrid 
+                posts={formattedPosts}
+                currentPage={1}
+                totalPages={1}
+                activeCategory="all"
+                baseRoute={`/tag/${slug}`}
+                hideHeader={true}
+                hideFilters={true}
+              />
+            ) : (
+               <div className="py-16 text-center">
+                 <p className="text-lg text-muted-foreground">
+                   No hay artículos enlazados a esta etiqueta todavía.
+                 </p>
+               </div>
+            )}
           </div>
         </section>
 
@@ -140,4 +166,8 @@ export default async function TagPage({ params }: TagPageProps) {
       <Footer />
     </>
   )
+ } catch (error) {
+    console.error(`[TagPage ERROR] Failed to load tag page for slug ${slug}:`, error);
+    throw error;
+ }
 }
