@@ -130,9 +130,17 @@ export default defineType({
           { title: 'Variabilidad Cardíaca', value: 'hrv' },
           { title: 'Ayuno Intermitente', value: 'ayuno' },
           { title: 'Longevidad Femenina', value: 'longevidad-femenina' },
+          { title: 'Biohacking Hogar', value: 'biohacking-hogar' },
         ],
       },
       description: 'Se genera automáticamente. Puedes editarlo después.',
+    }),
+    defineField({
+      name: 'tags',
+      title: 'SEO Tags (Etiquetas)',
+      type: 'array',
+      of: [{ type: 'reference', to: [{ type: 'tag' }] }],
+      description: 'Etiquetas semánticas generadas para enlazar este post con su Hub SGO.',
     }),
     defineField({
       name: 'aiGenerated',

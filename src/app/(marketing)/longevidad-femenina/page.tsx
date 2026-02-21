@@ -9,6 +9,7 @@ import { db } from "@/db"
 import { posts } from "@/db/schema"
 import { desc, eq, and, isNotNull, sql } from "drizzle-orm"
 import { generateItemListSchema } from "@/lib/seo/schema"
+import { sanityClient } from "@/lib/sanity/client"
 
 export const metadata: Metadata = {
   title: "Biohacking y Longevidad Femenina: Optimización del Eje Ovárico | Biohacking Lab",
@@ -63,6 +64,23 @@ export default async function LongevidadFemeninaPage(props: PageProps) {
     .orderBy(desc(posts.publishedAt))
     .limit(POSTS_PER_PAGE)
     .offset((currentPage - 1) * POSTS_PER_PAGE)
+
+  // Fetch Sanity Tags
+  const slugs = blogPosts.map(p => p.slug)
+  let enhancedPosts = blogPosts
+  if (slugs.length > 0) {
+    const sanityTagsPosts = await sanityClient.fetch(
+      `*[_type == "post" && slug.current in $slugs]{ "slug": slug.current, "tags": tags[]->{title, "slug": slug.current} }`,
+      { slugs }
+    )
+    const tagsMap = new Map<string, {title: string, slug: string}[]>(
+      sanityTagsPosts.map((p: any) => [p.slug, p.tags || []])
+    )
+    enhancedPosts = blogPosts.map((post: any) => ({
+      ...post,
+      tags: tagsMap.get(post.slug) || []
+    }))
+  }
 
   return (
     <main className="min-h-screen bg-background">
@@ -203,11 +221,13 @@ export default async function LongevidadFemeninaPage(props: PageProps) {
           </div>
 
           <BlogGrid 
-            posts={blogPosts} 
+            posts={enhancedPosts} 
             currentPage={currentPage}
             totalPages={totalPages}
             activeCategory={category}
             baseRoute="/longevidad-femenina" // Customize the pagination route to stay on this specific landing
+            hideHeader={true}
+            hideFilters={true}
           />
         </div>
       </section>
@@ -222,7 +242,7 @@ export default async function LongevidadFemeninaPage(props: PageProps) {
             generateItemListSchema({
               name: "Biohacking y Longevidad Femenina: Artículos",
               description: "Artículos, guías y protocolos respaldados por ciencia para la longevidad y salud de la mujer.",
-              items: blogPosts.map(post => ({
+              items: enhancedPosts.map((post: any) => ({
                 name: post.title,
                 url: `/blog/${post.slug}`,
                 description: post.excerpt || undefined,

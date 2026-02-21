@@ -22,6 +22,7 @@ export const marketingNav = [
     ]
   },
   { name: "Longevidad Femenina", href: "/longevidad-femenina" },
+  { name: "Biohacking Hogar", href: "/biohacking-hogar" },
   { name: "Blog", href: "/blog" },
   { name: "Apps", href: "/apps" },
 ]

@@ -17,7 +17,6 @@ function generateKey() {
 }
 
 // Helper to convert markdown to Portable Text
-// Helper to convert markdown to Portable Text
 function markdownToPortableText(markdown: string) {
   const blocks: any[] = []
   const lines = markdown.split('\n')
@@ -264,6 +263,7 @@ function normalizeCategory(category?: string): string {
   const normalized = category.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
   
   if (normalized.includes('mujer') || normalized.includes('femenin') || normalized.includes('ovari') || normalized.includes('menopausia') || normalized.includes('hormonas-femeninas')) return 'longevidad-femenina';
+  if (normalized.includes('hogar') || normalized.includes('casa') || normalized.includes('purificador') || normalized.includes('filtro') || normalized.includes('entorno') || normalized.includes('ambiente') || normalized.includes('smart')) return 'biohacking-hogar';
   if (normalized.includes('nootropico')) return 'nootropicos';
   if (normalized.includes('sueno') || normalized.includes('sleep')) return 'sueno';
   if (normalized.includes('nutricion')) return 'nutricion';
@@ -305,7 +305,7 @@ export async function generateBlogFromTopic(
         generatedData = JSON.parse(cleanJson);
     }
 
-    const { title, content, excerpt, category, faq, references } = generatedData;
+    const { title, content, excerpt, category, faq, references, tags } = generatedData;
 
     if (!title || !content) {
         throw new Error('Incomplete JSON response');
@@ -313,6 +313,32 @@ export async function generateBlogFromTopic(
 
     const slug = generateSlug(title)
     const portableTextContent = markdownToPortableText(content)
+
+    // Process Tags: Sanity creation/querying
+    const sanityTagRefs: any[] = []
+    if (Array.isArray(tags) && tags.length > 0) {
+      try {
+        for (const tagName of tags) {
+          const tagSlug = generateSlug(tagName)
+          // Look for existing tag
+          const existingTag = await sanityWriteClient.fetch('*[_type == "tag" && slug.current == $slug][0]{_id}', { slug: tagSlug })
+          if (existingTag) {
+            sanityTagRefs.push({ _type: 'reference', _ref: existingTag._id, _key: generateKey() })
+          } else {
+            // Create new tag
+            const newTag = await sanityWriteClient.create({
+              _type: 'tag',
+              title: tagName,
+              slug: { _type: 'slug', current: tagSlug },
+              aiGenerated: false
+            })
+            sanityTagRefs.push({ _type: 'reference', _ref: newTag._id, _key: generateKey() })
+          }
+        }
+      } catch (tagError) {
+        console.error("Error linking tags: ", tagError)
+      }
+    }
 
     return {
       success: true,
@@ -332,6 +358,7 @@ export async function generateBlogFromTopic(
         category: normalizeCategory(category),
         faq: Array.isArray(faq) ? faq.map((item: any) => ({ ...item, _key: generateKey() })) : [],
         references: Array.isArray(references) ? references.map((item: any) => ({ ...item, _key: generateKey() })) : [],
+        tags: sanityTagRefs,
         aiGenerated: true,
         author: "Juan Arango",
         authorRole: "Editor en Jefe",

@@ -16,6 +16,8 @@ import { NewsletterCard } from "@/components/blog/NewsletterCard"
 import { StyledPortableText } from "@/components/blog/StyledPortableText"
 import { MedicalDisclaimer } from "@/components/blog/MedicalDisclaimer"
 import { References } from "@/components/blog/References"
+import { AffiliateAdBlock, AffiliateAdProps } from "@/components/blog/AffiliateAdBlock"
+import { sanityClient } from "@/lib/sanity/client"
 import { generateBlogPostMetadata } from "@/lib/seo/metadata"
 import { 
   generateArticleSchema, 
@@ -55,7 +57,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   })
 }
 
-export const revalidate = 60 // ISR: Revalidate every 60 seconds
+export const revalidate = 3600 // ISR: Revalidate every 1 hour
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params
@@ -87,6 +89,25 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     }
     return block
   })
+
+  // Fetch Affiliate Ad directly from Sanity Studio using the slug
+  let affiliateAd: AffiliateAdProps | null = null
+  try {
+    affiliateAd = await sanityClient.fetch<AffiliateAdProps | null>(
+      `*[_type == "affiliateAd" && post->slug.current == $slug][0]{
+        internalName,
+        url,
+        image {
+          asset-> {
+            url
+          }
+        }
+      }`,
+      { slug }
+    )
+  } catch (error) {
+    console.error("Error fetching affiliate ad:", error)
+  }
 
   // Parse FAQ
   const faqData = post.faq as Array<{ question: string; answer: string }> | null
@@ -141,6 +162,13 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               )}
             </header>
 
+            {/* Mobile Affiliate Ad (Shows BEFORE the generic Mobile TOC) */}
+            {affiliateAd && (
+              <div className="lg:hidden mb-8">
+                <AffiliateAdBlock ad={affiliateAd} />
+              </div>
+            )}
+
             {/* Mobile TOC */}
             <div className="lg:hidden mb-8">
               <details className="rounded-lg border border-border bg-card p-4">
@@ -185,6 +213,14 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           {/* Sidebar (Desktop only) */}
           <aside className="hidden lg:block space-y-8 sticky top-24 h-fit self-start">
             <TableOfContents content={contentWithIds} />
+            
+            {/* Desktop Affiliate Ad (Shows AFTER the Desktop TOC) */}
+            {affiliateAd && (
+              <div className="mt-8">
+                <AffiliateAdBlock ad={affiliateAd} />
+              </div>
+            )}
+            
             <NewsletterCard />
           </aside>
         </div>

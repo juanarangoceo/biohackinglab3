@@ -204,13 +204,6 @@ export function AppsGrid() {
                   ))}
                 </div>
 
-                {/* CTA */}
-                <Button asChild variant="outline" className="w-full gap-2 bg-transparent">
-                  <a href={app.url} target="_blank" rel="noopener noreferrer">
-                    Ver app
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                </Button>
               </CardContent>
             </Card>
           ))}

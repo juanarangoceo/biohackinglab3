@@ -10,7 +10,8 @@ export const SINGLE_SHOT_BLOG_PROMPT = (topic: string, additionalPrompt?: string
     "title": "Un título viral y optimizado SEO (max 60 chars)",
     "content": "El contenido completo del artículo en formato Markdown (usa H2, H3, **negritas para resaltar palabras clave**, listas). NO uses H1. Mínimo 1200 palabras.",
     "excerpt": "Un resumen atractivo de 140-160 caracteres.",
-    "category": "Una de estas opciones EXACTAMENTE (no uses tildes ni mayúsculas): nootropicos, sueno, longevidad, nutricion, fitness, longevidad-femenina",
+    "category": "Una de estas opciones EXACTAMENTE (no uses tildes ni mayúsculas): nootropicos, sueno, longevidad, nutricion, fitness, longevidad-femenina, biohacking-hogar",
+    "tags": ["Etiqueta 1", "Etiqueta 2", "Etiqueta 3", "Etiqueta 4", "Etiqueta 5"],
     "faq": [
       {
         "question": "¿Pregunta frecuente relevante al tema?",
@@ -43,6 +44,10 @@ export const SINGLE_SHOT_BLOG_PROMPT = (topic: string, additionalPrompt?: string
   - Usa palabras clave long-tail para SEO
   - Formato de pregunta: "¿Cómo...", "¿Qué es...", "¿Por qué...", "¿Cuándo..."
 
+  ETIQUETAS SEO (SISTEMA DE CLÚSTERES):
+  - Genera un array "tags" con exactamente 5 etiquetas cortas (ej: "Luz Roja", "Ayuno de Dopamina", "Ritmo Circadiano").
+  - Deben ser específicas del nicho abordado en este post, para poder conectarlas como Clústeres Semánticos.
+
   REFERENCIAS CIENTÍFICAS (OBLIGATORIO - SISTEMA CRÍTICO):
   - DEBES generar un array "references" con exactamente 3 a 5 estudios.
   - El sistema fallará si este campo no existe o está vacío.
@@ -55,3 +60,24 @@ export const SINGLE_SHOT_BLOG_PROMPT = (topic: string, additionalPrompt?: string
   TONO: Científico, empoderador, directo, "tú" en lugar de "usted".
   IMPORTANTE: Responde ÚNICAMENTE con el JSON válido.
 `
+
+export const SINGLE_SHOT_TAG_PROMPT = (topic: string, additionalPrompt?: string) => `
+  Actúa como un experto en Biohacking, Longevidad y Optimización del Rendimiento Humano.
+  Redacta un ensayo estructurado tipo "Hub SGO" o glosario experto sobre la etiqueta: "${topic}".
+  ${additionalPrompt ? `INSTRUCCIONES EXTRA: ${additionalPrompt}` : ""}
+
+  Genera un objeto JSON con la siguiente estructura exacta:
+  {
+    "content": "El contenido en formato Markdown (usa H2, H3, **negritas para enfatizar**). NO uses H1. Mínimo 500 palabras."
+  }
+
+  ESTRUCTURA DEL CONTENIDO (Markdown):
+  1. H2: ¿Qué es ${topic}? (Definición clara y directa para SEO).
+  2. H2: Mecanismo de Acción (Cómo funciona biológicamente de forma sencilla).
+  3. H2: Beneficios Principales (Lista de viñetas).
+  4. H2: Relación con el Biohacking / Longevidad.
+
+  TONO: Científico, empoderador, enciclopédico pero fácil de leer (como una Wiki de nicho).
+  IMPORTANTE: No saludes, no confirmes, responde ÚNICAMENTE con el objeto JSON válido.
+`
+
