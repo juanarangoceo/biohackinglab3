@@ -18,6 +18,7 @@ import { MedicalDisclaimer } from "@/components/blog/MedicalDisclaimer"
 import { References } from "@/components/blog/References"
 import { AffiliateAdBlock, AffiliateAdProps } from "@/components/blog/AffiliateAdBlock"
 import { sanityClient } from "@/lib/sanity/client"
+import Link from "next/link"
 import { generateBlogPostMetadata } from "@/lib/seo/metadata"
 import { 
   generateArticleSchema, 
@@ -90,23 +91,32 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     return block
   })
 
-  // Fetch Affiliate Ad directly from Sanity Studio using the slug
+  // Fetch Affiliate Ad and Tags directly from Sanity Studio using the slug
   let affiliateAd: AffiliateAdProps | null = null
+  let postTags: {title: string, slug: string}[] = []
   try {
-    affiliateAd = await sanityClient.fetch<AffiliateAdProps | null>(
-      `*[_type == "affiliateAd" && post->slug.current == $slug][0]{
-        internalName,
-        url,
-        image {
-          asset-> {
-            url
+    const [adResult, tagsResult] = await Promise.all([
+      sanityClient.fetch<AffiliateAdProps | null>(
+        `*[_type == "affiliateAd" && post->slug.current == $slug][0]{
+          internalName,
+          url,
+          image {
+            asset-> {
+              url
+            }
           }
-        }
-      }`,
-      { slug }
-    )
+        }`,
+        { slug }
+      ),
+      sanityClient.fetch(
+        `*[_type == "post" && slug.current == $slug][0]{ "tags": tags[]->{title, "slug": slug.current} }`,
+        { slug }
+      )
+    ])
+    affiliateAd = adResult
+    postTags = tagsResult?.tags || []
   } catch (error) {
-    console.error("Error fetching affiliate ad:", error)
+    console.error("Error fetching from Sanity:", error)
   }
 
   // Parse FAQ
@@ -124,10 +134,17 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           <article>
             {/* Header */}
             <header className="mb-8 border-b border-border pb-8">
-              <div className="flex items-center gap-3 mb-4">
+              <div className="flex flex-wrap items-center gap-2 mb-4">
                 <span className="inline-block px-3 py-1 text-xs font-semibold text-primary bg-primary/10 rounded-full uppercase">
                   {post.category}
                 </span>
+                {postTags.map(tag => (
+                  <Link key={tag.slug} href={`/tag/${tag.slug}`} className="z-10 relative">
+                    <span className="inline-block px-2 py-1 text-[10px] font-mono border border-primary/20 text-primary/80 rounded-full hover:bg-secondary cursor-pointer transition-colors">
+                      #{tag.title}
+                    </span>
+                  </Link>
+                ))}
               </div>
               
               <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
