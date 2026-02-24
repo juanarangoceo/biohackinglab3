@@ -17,6 +17,7 @@ import { StyledPortableText } from "@/components/blog/StyledPortableText"
 import { MedicalDisclaimer } from "@/components/blog/MedicalDisclaimer"
 import { References } from "@/components/blog/References"
 import { AffiliateAdBlock, AffiliateAdProps } from "@/components/blog/AffiliateAdBlock"
+import { YouTubeVideoBlock, YouTubeVideoProps } from "@/components/blog/YouTubeVideoBlock"
 import { sanityClient } from "@/lib/sanity/client"
 import Link from "next/link"
 import { generateBlogPostMetadata } from "@/lib/seo/metadata"
@@ -25,6 +26,7 @@ import {
   generateFAQSchema, 
   generateBreadcrumbSchema
 } from "@/lib/seo/schema"
+import { getCategoryTitle } from "@/lib/utils"
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -91,11 +93,13 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     return block
   })
 
-  // Fetch Affiliate Ad and Tags directly from Sanity Studio using the slug
+  // Fetch Affiliate Ad, Tags, and YouTube Video directly from Sanity Studio using the slug
   let affiliateAd: AffiliateAdProps | null = null
   let postTags: {title: string, slug: string}[] = []
+  let youtubeVideo: YouTubeVideoProps | null = null
+  
   try {
-    const [adResult, tagsResult] = await Promise.all([
+    const [adResult, tagsResult, youtubeResult] = await Promise.all([
       sanityClient.fetch<AffiliateAdProps | null>(
         `*[_type == "affiliateAd" && post->slug.current == $slug][0]{
           internalName,
@@ -111,10 +115,19 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       sanityClient.fetch(
         `*[_type == "post" && slug.current == $slug][0]{ "tags": tags[]->{title, "slug": slug.current} }`,
         { slug }
+      ),
+      sanityClient.fetch<YouTubeVideoProps | null>(
+        `*[_type == "youtubeVideo" && post->slug.current == $slug][0]{
+          title,
+          url,
+          description
+        }`,
+        { slug }
       )
     ])
     affiliateAd = adResult
     postTags = tagsResult?.tags || []
+    youtubeVideo = youtubeResult
   } catch (error) {
     console.error("Error fetching from Sanity:", error)
   }
@@ -127,7 +140,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <Header />
       
       <div className="container mx-auto px-4 pt-24 pb-12 max-w-7xl">
-        <Breadcrumbs category={post.category} title={post.title} />
+        <Breadcrumbs category={getCategoryTitle(post.category)} title={post.title} />
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
           {/* Main Content */}
@@ -136,7 +149,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <header className="mb-8 border-b border-border pb-8">
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 <span className="inline-block px-3 py-1 text-xs font-semibold text-primary bg-primary/10 rounded-full uppercase">
-                  {post.category}
+                  {getCategoryTitle(post.category)}
                 </span>
                 {postTags.map(tag => (
                   <Link key={tag.slug} href={`/tag/${tag.slug}`} className="z-10 relative">
@@ -152,9 +165,19 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               </h1>
               
               {post.excerpt && (
-                <p className="text-xl text-muted-foreground mb-4">
+                <p className="text-xl text-muted-foreground mb-6">
                   {post.excerpt}
                 </p>
+              )}
+              
+              {post.coverImage && (
+                <div className="relative w-full aspect-[2/1] mb-8 overflow-hidden rounded-xl border border-border/50">
+                  <img
+                    src={post.coverImage}
+                    alt={post.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               )}
               
               {/* Author Info */}
@@ -202,6 +225,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <div className="max-w-none">
               <StyledPortableText value={contentWithIds} />
             </div>
+
+            {/* YouTube Video (if any) */}
+            <YouTubeVideoBlock video={youtubeVideo} />
 
             {/* Medical Disclaimer */}
             <div className="mt-8">
@@ -265,7 +291,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               generateBreadcrumbSchema([
                 { name: "Inicio", url: "/" },
                 { name: "Blog", url: "/blog" },
-                { name: post.category, url: `/blog?category=${post.category}` },
+                { name: getCategoryTitle(post.category), url: `/blog?category=${post.category}` },
                 { name: post.title },
               ])
             ]

@@ -81,3 +81,27 @@ export const SINGLE_SHOT_TAG_PROMPT = (topic: string, additionalPrompt?: string)
   IMPORTANTE: No saludes, no confirmes, responde ÚNICAMENTE con el objeto JSON válido.
 `
 
+export const SINGLE_SHOT_NEUROAUDIO_PROMPT = (topic: string, category: string, additionalPrompt?: string) => `
+  Actúa como un experto en Neurociencia, Biohacking y Frecuencias Acústicas (Solfeggio, Binaural Beats, Ondas Cerebrales).
+  Redacta la descripción científica y los beneficios de un track de audio para la plataforma "NeuroAudio" de Biohacking Lab 3.0.
+  
+  TEMA / ENFOQUE DEL AUDIO: "${topic}"
+  CATEGORÍA ASIGNADA: "${category}"
+  ${additionalPrompt ? 'INSTRUCCIONES EXTRA: ' + additionalPrompt : ""}
+
+  Genera un objeto JSON con la siguiente estructura exacta:
+  {
+    "title": "Un título atractivo y misterioso/científico (max 60 chars)",
+    "content": "El contenido en formato Markdown (usa H2, H3, **negritas para resaltar palabras clave como frecuencias, Hz, neurotransmisores, beneficios**). NO uses H1. NO lo hagas excesivamente largo, debe ser conciso, estructurado y enfocado a mantener la retención del usuario que lo va a escuchar.",
+    "excerpt": "Un resumen atractivo de 140-160 caracteres sobre qué hace este audio a tu cerebro.",
+    "tags": ["Frecuencia", "Beneficio Principal", "Estado Mental"]
+  }
+
+  ESTRUCTURA DEL CONTENIDO (Markdown):
+  1. H2: ¿Qué le hace esta frecuencia a tu cerebro? (Explicación científica breve pero impactante).
+  2. H2: Beneficios Comprobados (Lista de viñetas con **palabras clave** marcadas en negrita).
+  3. H2: Protocolo de Escucha (Cuándo y cómo escucharlo: Ej. con audífonos, antes de dormir, trabajando).
+
+  TONO: Muy científico pero accesible, directo, "tú" en lugar de "usted". Usa jerga de biohacking (optimización, down-regulation, up-regulation, neuroplasticidad).
+  IMPORTANTE: Responde ÚNICAMENTE con el objeto JSON válido.
+`

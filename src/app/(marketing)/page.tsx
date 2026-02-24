@@ -1,6 +1,7 @@
 import { Header } from "@/components/sections/header"
 import { HeroSection } from "@/components/sections/hero-section"
 import { TopicsSection } from "@/components/sections/topics-section"
+import { NeuroAudioShowcase } from "@/components/sections/neuroaudio-showcase"
 import { MethodsSection } from "@/components/sections/methods-section"
 import { BenefitsSection } from "@/components/sections/benefits-section"
 import { SuggestedBlogsSection } from "@/components/sections/suggested-blogs-section"
@@ -16,6 +17,7 @@ export default function HomePage() {
       <Header />
       <HeroSection />
       <TopicsSection />
+      <NeuroAudioShowcase />
       <MethodsSection />
       <BenefitsSection />
       <SuggestedBlogsSection />

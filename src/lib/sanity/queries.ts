@@ -83,3 +83,63 @@ export interface SanityPost {
 export interface SanityPostFull extends SanityPost {
   content: any[] // Portable Text blocks
 }
+
+// --- NeuroAudio Queries ---
+
+export const neuroAudioQuery = `
+  *[_type == "neuroAudio"] | order(_createdAt desc) {
+    _id,
+    title,
+    slug,
+    category,
+    youtubeUrl,
+    excerpt,
+    "coverImage": coverImage.asset->url,
+    tags
+  }
+`
+
+export const neuroAudioByCategoryQuery = `
+  *[_type == "neuroAudio" && category == $category] | order(_createdAt desc) {
+    _id,
+    title,
+    slug,
+    category,
+    youtubeUrl,
+    excerpt,
+    "coverImage": coverImage.asset->url,
+    tags
+  }
+`
+
+export const neuroAudioBySlugQuery = `
+  *[_type == "neuroAudio" && slug.current == $slug][0] {
+    _id,
+    title,
+    slug,
+    category,
+    youtubeUrl,
+    excerpt,
+    content,
+    "coverImage": coverImage.asset->url,
+    tags,
+    _createdAt
+  }
+`
+
+export interface SanityNeuroAudio {
+  _id: string
+  title: string
+  slug: { current: string }
+  category: string
+  youtubeUrl: string
+  excerpt?: string
+  coverImage?: string
+  tags?: string[]
+}
+
+export interface SanityNeuroAudioFull extends SanityNeuroAudio {
+  content: any[]
+  _createdAt: string
+}
+

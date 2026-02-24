@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { BlogPagination } from "./BlogPagination"
 import { topics } from "@/config/topics"
+import { getCategoryTitle } from "@/lib/utils"
 
 interface BlogPost {
   id: string
@@ -55,6 +56,7 @@ function formatDateSafe(dateVal: any, formatType: 'full' | 'short' = 'full'): st
     return 'Próximamente';
   }
 }
+
 
 export function BlogGrid({ posts, currentPage, totalPages, activeCategory, baseRoute, hideHeader, hideFilters }: BlogGridProps) {
   // Separate featured posts (first 2 if on page 1)
@@ -115,14 +117,23 @@ export function BlogGrid({ posts, currentPage, totalPages, activeCategory, baseR
             {featuredPosts.map((article) => (
               <Link key={article.slug} href={`/blog/${article.slug}`}>
                 <Card className="group h-full overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:bg-card">
-                  <CardContent className="flex h-full flex-col p-8">
-                    <div className="mb-4 flex flex-wrap items-center gap-2">
+                  {article.coverImage && (
+                    <div className="relative aspect-[16/10] w-full overflow-hidden border-b border-border/50">
+                      <img 
+                        src={article.coverImage} 
+                        alt={article.title}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
+                  )}
+                  <CardContent className="p-6 lg:p-8">
+                    <div className="mb-4 mt-2 flex flex-wrap items-center gap-2">
                       <Badge className="bg-primary/20 text-primary hover:bg-primary/30">
                         <TrendingUp className="mr-1 h-3 w-3" />
                         Destacado
                       </Badge>
                       <Badge variant="secondary" className="font-mono text-xs capitalize">
-                        {article.category}
+                        {getCategoryTitle(article.category)}
                       </Badge>
                       {article.tags && article.tags.slice(0, 2).map(tag => (
                         <Link key={tag.slug} href={`/tag/${tag.slug}`} className="z-10 relative">
@@ -137,7 +148,7 @@ export function BlogGrid({ posts, currentPage, totalPages, activeCategory, baseR
                       {article.title}
                     </h2>
                     
-                    <p className="mb-6 flex-grow text-muted-foreground leading-relaxed">
+                    <p className="mb-8 text-muted-foreground leading-relaxed">
                       {article.excerpt || 'Artículo de biohacking'}
                     </p>
                     
@@ -168,10 +179,19 @@ export function BlogGrid({ posts, currentPage, totalPages, activeCategory, baseR
           {regularPosts.map((article) => (
             <Link key={article.slug} href={`/blog/${article.slug}`}>
               <Card className="group h-full overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:bg-card">
-                <CardContent className="flex h-full flex-col p-6">
-                  <div className="mb-4 flex flex-wrap items-center gap-2">
+                {article.coverImage && (
+                  <div className="relative aspect-[16/10] w-full overflow-hidden border-b border-border/50">
+                    <img 
+                      src={article.coverImage} 
+                      alt={article.title}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+                )}
+                <CardContent className="p-6">
+                  <div className="mb-4 mt-2 flex flex-wrap items-center gap-2">
                     <Badge variant="secondary" className="font-mono text-xs capitalize">
-                      {article.category}
+                      {getCategoryTitle(article.category)}
                     </Badge>
                     {article.tags && article.tags.slice(0, 2).map(tag => (
                       <Link key={tag.slug} href={`/tag/${tag.slug}`} className="z-10 relative">
@@ -186,7 +206,7 @@ export function BlogGrid({ posts, currentPage, totalPages, activeCategory, baseR
                     {article.title}
                   </h3>
                   
-                  <p className="mb-4 flex-grow text-sm text-muted-foreground leading-relaxed">
+                  <p className="mb-8 text-sm text-muted-foreground leading-relaxed">
                     {article.excerpt || 'Artículo de biohacking'}
                   </p>
                   

@@ -1,4 +1,4 @@
-import { Brain, Sun, Moon, Thermometer, Dumbbell, Pill, Heart, Zap, LucideIcon } from "lucide-react"
+import { Brain, Sun, Moon, Thermometer, Dumbbell, Pill, Heart, Zap, Sparkles, Home, Headphones, LucideIcon } from "lucide-react"
 
 export interface Topic {
   slug: string
@@ -282,6 +282,105 @@ export const topics: Topic[] = [
       {
         question: "¿Cuál es el mejor protocolo para empezar?",
         answer: "El 16/8 (ayunar 16 horas, comer en una ventana de 8 horas) es el más sostenible y popular."
+      }
+    ]
+  },
+  {
+    slug: "longevidad-femenina",
+    title: "Longevidad Femenina",
+    description: "Optimización hormonal, biorritmos femeninos y biohacking adaptado a la biología de la mujer.",
+    icon: Sparkles,
+    seoTitle: "Longevidad Femenina y Biohacking para Mujeres | Biohacking Lab",
+    seoDescription: "Descubre cómo adaptar protocolos de biohacking a la fisiología femenina, optimizar tus hormonas y extender tu healthspan (años de vida saludable).",
+    intro: {
+      heading: "Biohacking a la Medida de tu Biología",
+      content: "Históricamente, la mayoría de los estudios científicos y protocolos de salud se han centrado en la fisiología masculina. La longevidad femenina reconoce que el cuerpo de la mujer experimenta fluctuaciones hormonales complejas a lo largo del mes (ciclo infradiano) y transiciones vitales (perimenopausia, menopausia). Nuestro objetivo es adaptar herramientas como el ayuno, el entrenamiento y la nutrición a tu ritmo único, no luchar contra él."
+    },
+    keyBenefits: [
+      "Optimización del ciclo menstrual y alivio de síntomas (SPM).",
+      "Transición suave hacia la perimenopausia y menopausia.",
+      "Protección de la densidad ósea y muscular a largo plazo.",
+      "Energía estable sincronizada con tus biorritmos reales."
+    ],
+    scientificBasis: "Sincronización de estilo de vida con las fases del ciclo infradiano (folicular, ovulatoria, lútea, menstrual) y soporte endócrino específico.",
+    faq: [
+      {
+        question: "¿Las mujeres deben ayunar diferente que los hombres?",
+        answer: "Sí. Los ayunos en mujeres en edad reproductiva deben adaptarse a la fase del ciclo para evitar aumentar el cortisol y afectar la ovulación o la progesterona."
+      },
+      {
+        question: "¿Es importante el entrenamiento de fuerza para mujeres?",
+        answer: "Absolutamente crucial. Es la mejor herramienta para mantener la densidad ósea, mejorar la tolerancia a la glucosa y contrarrestar la pérdida muscular (sarcopenia)."
+      },
+      {
+        question: "¿Qué papel juega el manejo del estrés?",
+        answer: "Las hormonas femeninas son extremadamente sensibles al cortisol. Protocolos de relajación no son 'ayudas', son fundamentos para el equilibrio de estrógenos/progesterona."
+      }
+    ]
+  },
+  {
+    slug: "biohacking-hogar",
+    title: "Biohacking Hogar",
+    description: "Optimiza tu entorno: purificación de aire, iluminación circadiana, filtración de agua y minimización de toxinas.",
+    icon: Home,
+    seoTitle: "Biohacking Hogar: Optimiza tu Entorno | Biohacking Lab",
+    seoDescription: "Aprende a hackear tu espacio físico. Iluminación circadiana, purificación de aire y agua, y reducción de exposición a toxinas modernas.",
+    intro: {
+      heading: "Tu Entorno Dicta tu Biología",
+      content: "Pasamos más del 80% de nuestra vida en espacios interiores. No importa cuán bien comas o entrenes si tu hogar está saboteando tus ritmos biológicos. El Biohacking Hogar trata tu casa como una extensión de tu cuerpo. Desde alinear la iluminación con tu reloj circadiano interno, hasta respirar aire de calidad clínica y beber agua estructurada. Modificamos el ambiente externo para lograr una homeostasis interna perfecta."
+    },
+    keyBenefits: [
+      "Sueño profundo garantizado por entornos oscuros y fríos.",
+      "Mayor productividad y foco gracias a iluminación inteligente.",
+      "Reducción de carga tóxica (PFAS, microplásticos, metales pesados).",
+      "Prevención de fatiga crónica y 'síndrome del edificio enfermo'."
+    ],
+    scientificBasis: "Manipulación de estímulos ambientales (luz, espectro electromagnético, partículas en el aire, temperatura) para señalizar respuestas biológicas óptimas (cronobiología y toxicología ambiental).",
+    faq: [
+      {
+        question: "¿Qué es la iluminación circadiana?",
+        answer: "Es el uso de bombillas o sistemas que imitan la progresión natural de la luz del sol: brillante y azulada en la mañana, tenue, roja y anaranjada en la tarde/noche para no suprimir la melatonina."
+      },
+      {
+        question: "¿Cuál es la inversión más importante para el hogar?",
+        answer: "Generalmente, invertir en un filtro de agua de ósmosis inversa de calidad o un purificador de aire con filtro HEPA verdadero son los cambios de mayor impacto inmediato."
+      },
+      {
+        question: "¿Debe preocuparme la pintura o muebles nuevos?",
+        answer: "Sí, liberan COVs (Compuestos Orgánicos Volátiles) que interrumpen el sistema endocrino. La ventilación agresiva y las plantas purificadoras ayudan a mitigarlo."
+      }
+    ]
+  },
+  {
+    slug: "neuroaudio",
+    title: "NeuroAudio",
+    description: "Biohacking acústico avanzado. Frecuencias comprobadas para inducir concentración profunda, estrés mínimo y sueño celular.",
+    icon: Headphones,
+    seoTitle: "NeuroAudio: Biohacking Acústico y Frecuencias | Biohacking Lab",
+    seoDescription: "Descubre el poder del sonido para hackear tu cerebro. Desde ondas Gamma para enfoque, hasta deltas para insomnio.",
+    intro: {
+      heading: "Hackea tu Biología a través del Sonido",
+      content: "El cerebro humano opera mediante frecuencias eléctricas. Utilizando el arrastre de ondas cerebrales (Brainwave Entrainment) mediante ritmos isocrónicos y binaurales, puedes alterar tu estado biológico y mental bajo demanda y sin suplementos."
+    },
+    keyBenefits: [
+      "Concentración hiperfocal inducida (Flow State).",
+      "Activación del sistema parasimpático casi instantánea.",
+      "Optimización de los ciclos REM y sueño profundo.",
+      "Alivio de ansiedad mediante frecuencias armónicas específicas."
+    ],
+    scientificBasis: "El cerebro sincroniza sus ráfagas eléctricas con los pulsos de audio externos dominantes. Escuchar ciertas frecuencias (ej. 40Hz) fuerza fisiológicamente a tu cerebro hacia ondas Gamma.",
+    faq: [
+      {
+        question: "¿Necesito auriculares especiales?",
+        answer: "Para frecuencias binaurales clásicas sí necesitas estéreo. Para tonos isocrónicos o frecuencias Solfeggio, altavoces normales bastan, pero los auriculares maximizan la inmersión."
+      },
+      {
+        question: "¿Es seguro a largo plazo?",
+        answer: "Completamente seguro. Sin embargo, no se recomienda usar frecuencias ultra-estimulantes antes de dormir, ni tonos sedantes si vas a conducir."
+      },
+      {
+        question: "¿A qué volumen debo escuchar?",
+        answer: "A un volumen bajo o moderado. No necesitas 'sentir' los bajos agresivamente. El arrastre cerebral ocurre subliminalmente en el córtex auditivo."
       }
     ]
   }

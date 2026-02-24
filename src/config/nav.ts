@@ -25,6 +25,16 @@ export const marketingNav = [
   { name: "Biohacking Hogar", href: "/biohacking-hogar" },
   { name: "Blog", href: "/blog" },
   { name: "Apps", href: "/apps" },
+  { 
+    name: "NeuroAudio", 
+    href: "/neuroaudio",
+    children: [
+      { name: "Activación y Enfoque", href: "/neuroaudio/activacion-enfoque" },
+      { name: "Reducción de Estrés", href: "/neuroaudio/reduccion-estres" },
+      { name: "Sueño Profundo", href: "/neuroaudio/sueno-recuperacion" },
+      { name: "Bienestar Holístico", href: "/neuroaudio/bienestar-holistico" },
+    ]
+  },
 ]
 
 export const dashboardNav = [

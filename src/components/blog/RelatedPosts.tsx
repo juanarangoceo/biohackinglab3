@@ -48,7 +48,16 @@ export async function RelatedPosts({ currentSlug, category }: RelatedPostsProps)
       <div className="grid gap-6 md:grid-cols-3">
         {relatedPosts.map((post: typeof posts.$inferSelect, index: number) => (
           <Link key={post.slug} href={`/blog/${post.slug}`}>
-            <Card className="group h-full border-border/50 bg-card/50 transition-all hover:border-primary/50 hover:bg-card">
+            <Card className="group h-full overflow-hidden border-border/50 bg-card/50 transition-all hover:border-primary/50 hover:bg-card">
+              {post.coverImage && (
+                <div className="relative h-40 w-full overflow-hidden border-b border-border/50">
+                  <img 
+                    src={post.coverImage} 
+                    alt={post.title}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+              )}
               <CardContent className="flex h-full flex-col p-6">
                 <div className="mb-4 flex items-center gap-2">
                   <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
